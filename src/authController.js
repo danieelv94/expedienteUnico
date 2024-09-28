@@ -12,14 +12,17 @@ export function cerrarSesion(req, res) {
             console.error("Error al cerrar sesión:", err);
             res.status(500).json({ error: "Error al cerrar sesión" });
         } else {
-            res.redirect("/login"); // Redirige al usuario a la página de login
+            res.redirect("/login");   
+ // Redirige al usuario a la página de login
         }
     });
 }
+
+// ... otras funciones ...
+
 // Función para procesar el login
 export async function procesarLogin(req, res) {
     const { username, password } = req.body;
-    console.log(`Username: ${username}, Password: ${password}`); // Para verificar si los datos están llegando correctamente
 
     try {
         const [result] = await pool.query(
@@ -30,10 +33,27 @@ export async function procesarLogin(req, res) {
         if (result.length > 0) {
             const usuario = result[0];
             const match = await bcrypt.compare(password, usuario.password_usuario);
-            
+
             if (match) {
-                req.session.user = usuario; // Guarda la información del usuario en la sesión
-                res.redirect("/usuarios");
+                
+                const [rolesResult] = await pool.query(
+                    "SELECT rol FROM usuarios WHERE no_empleado = ?",
+                    [username]
+                );
+
+                if (rolesResult.length > 0) {
+                    usuario.rol = rolesResult[0].rol; 
+                    req.session.user = usuario; 
+
+                    // Redirigir según el rol del usuario
+                    if (usuario.rol === 'DIVA') {
+                        res.redirect("/mis-obras"); 
+                    } else {
+                        res.redirect("/obras"); 
+                    }
+                } else {
+                    res.render("pages/login", { error: "Error al obtener el rol del usuario" });
+                }
             } else {
                 res.render("pages/login", { error: "Usuario o contraseña incorrectos" });
             }
@@ -81,5 +101,6 @@ export async function procesarRegistro(req, res) {
         res.status(500).json({ error: "Error en el servidor" });
     }
 }
+
 
 

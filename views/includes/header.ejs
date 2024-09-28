@@ -1,17 +1,27 @@
 <header class="header">
   <a href="./" class="logo">
-    <img src="public/imgs/logo.png" alt="Logo" />
+    <img src="../public/imgs/logo.png" alt="Logo" />
   </a>
   <input class="menu-btn" type="checkbox" id="menu-btn" />
   <label class="menu-icon" for="menu-btn"><span class="navicon"></span></label>
   <ul class="menu">
-    <li>
-      <a class="menu-item" href="/"> Inicio </a>
-    </li>
-    <li>
-      <a class="menu-item" href="/logout"> Cerrar Sesión </a>
-    </li>
-    <li>
-    </li>
+      <li>
+          <a class="menu-item" href="/"> Inicio </a>
+      </li>
+      <% if (req.session.user && (req.session.user.rol === 'DIVA administrador' || req.session.user.rol === 'DIVA')) { %> 
+          <% if (req.session.user.rol === 'DIVA administrador') { %>
+              <li>
+                  <a class="menu-item" href="/obras"> Obras </a> 
+              </li>
+          <% } %>
+          <% if (req.session.user.rol === 'DIVA') { %> 
+              <li>
+                  <a class="menu-item" href="/mis-obras"> Mis Obras </a> 
+              </li>
+          <% } %>
+      <% } %>
+      <li>
+          <a class="menu-item" href="/logout"> Cerrar Sesión </a>
+      </li>
   </ul>
 </header>

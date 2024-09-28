@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <%- include('../includes/head') %>  
+    <title>Check-in de Obra</title>
+</head>
+<body>
+    <%- include('../includes/header', { req: req, obraId: obra.id_obra }) %>
+
+    <div class="container" style="margin-top: 80px !important"> 
+        <div class="row justify-content-md-center">
+            <div class="col-md-8">
+
+                <h1 class="text-center">Check-in de Obra</h1> 
+
+                <div class="card shadow-sm"> 
+                    <div class="card-body">
+
+                        <h2>Detalles de la Obra</h2>
+                        <p>Nombre de la Obra: <%= obra.nombre_obra %></p> 
+                        <p>Descripción: <%= obra.descripcion_obra %></p>
+                        <p>Encargado: <%= obra.diva_asignada_nombre || 'Sin asignar' %></p> 
+                        <p>Número de visitas: <%= obra.num_visitas %></p>
+
+                        <% if (obra.fotos && obra.fotos.length > 0) { %>
+                            <h3>Fotos de la última visita:</h3>
+                            <div class="row">
+                                <% obra.fotos.forEach(function(foto) { %>
+                                    <div class="col-md-4 mb-3">
+                                        <img src="<%= foto %>" class="img-fluid" alt="Foto de la obra">
+                                    </div>
+                                <% }); %>
+                            </div>
+                        <% } %>
+
+                        <h2>Agregar Fotografías</h2>
+                        <form action="/subir-fotos/<%= obra.id_obra %>" method="POST" enctype="multipart/form-data"> 
+                            <input type="file" name="fotos" multiple class="form-control"> 
+                            <button type="submit" class="btn btn-primary mt-2">Subir Fotos</button>
+                        </form>
+
+                        <h2 class="mt-4">Check-in de Documentación</h2>
+                        <form action="/check-in-documentacion/<%= obra.id_obra %>" method="POST">
+                            <div class="mb-3">
+                                <label for="documentacion" class="form-label">Documentos entregados:</label>
+                                <textarea id="documentacion" name="documentacion" class="form-control"></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Registrar Check-in</button>
+                        </form>
+
+                    </div> 
+                </div> 
+
+            </div> 
+        </div> 
+    </div>
+
+    <%- include('../includes/scripts') %> 
+</body>
+</html>

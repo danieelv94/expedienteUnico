@@ -32,12 +32,7 @@
       ></label>
       <ul class="menu">
         <li>
-          <a class="menu-item" href="/"> Inicio </a>
-        </li>
-        <li>
-          <a class="menu-item" href="/usuarios">
-            Crud
-          </a>
+          <a class="menu-item" href="/obras"> Obras </a>
         </li>
       </ul>
     </header>
@@ -47,50 +42,49 @@
       <div class="row justify-content-md-center mb-5">
         <div class="col-md-6 mb-5">
           <h3 class="text-center">
-             <a href="/usuarios">
+             <a href="/obras">
               <i class="bi bi-arrow-left-circle"></i>
             </a>
             Actualizar Obra
           </h3>
           <form action="/actualizar-obra/<%= obra.id_obra %>" method="POST">
-                <input type="hidden" name="_method" value="PUT">
             <div class="mb-3">
-                <label for="nombre_alumno" class="form-label"> Obra </label>
+                <label for="nombre_obra" class="form-label">Obra</label>
                 <input
-                type="text"
-                name="nombre_alumno"
-                class="form-control"
-                value="<%= estudiante.nombre_alumno %>"
+                    type="text"
+                    name="nombre_obra"
+                    class="form-control"
+                    value="<%= obra.nombre_obra %>"
                 />
             </div>
             <div class="mb-3">
-                <label for="email_alumno" class="form-label"> Descripción Obra</label>
+                <label for="descripcion_obra" class="form-label">Descripción Obra</label>
                 <input
-                type="text"
-                name="email_alumno"
-                class="form-control"
-                value="<%= estudiante.email_alumno %>"
+                    type="text"
+                    name="descripcion_obra"
+                    class="form-control"
+                    value="<%= obra.descripcion_obra %>"
                 />
             </div>
             <div class="mb-3">
-                <label for="curso_alumno">Encargado</label>
-                <select name="curso_alumno" class="form-select">
-                <option value="" <% if (estudiante.curso_alumno === "") { %>selected<% } %>>Seleccionar Encargado de Obra</option>
-                <option value="Armando" <% if (estudiante.curso_alumno === "Armando") { %>selected<% } %>>Armando</option>
-                <option value="Fernanda" <% if (estudiante.curso_alumno === "Fernanda") { %>selected<% } %>>Fernanda</option>
-                <option value="Medina" <% if (estudiante.curso_alumno === "Medina") { %>selected<% } %>>Medina</option>
-                <option value="Leopoldo" <% if (estudiante.curso_alumno === "Leopoldo") { %>selected<% } %>>Leopoldo</option>
-                </select>
-            </div>
-
+              <label for="diva_asignada">Encargado</label>
+              <select name="diva_asignada" class="form-select">
+                  <option value="">Seleccionar Encargado de Obra</option>
+                  <% divas.forEach(function(diva) { %>
+                      <option value="<%= diva.id_usuario %>" 
+                          <% if (obra.diva_asignada == diva.id_usuario) { %> selected <% } %> > 
+                          <%= diva.nombre_usuario %>
+                      </option> 
+                  <% }); %>
+              </select>
+          </div>
             <div class="d-grid gap-2 col-12 mx-auto mt-4 mb-4">
                 <button class="btn btn-primary" type="submit">
-                Actualizar Estudiante
+                    Actualizar Obra
                 </button>
             </div>
-            </form>
-
-        </div>
+        </form>
+                </div>
       </div>
     </div>
     <%- include('../includes/scripts') %>

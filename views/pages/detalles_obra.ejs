@@ -32,12 +32,7 @@
       ></label>
       <ul class="menu">
         <li>
-          <a class="menu-item" href="/"> Inicio </a>
-        </li>
-        <li>
-          <a class="menu-item" href="/">
-            Crud
-          </a>
+          <a class="menu-item" href="/obras"> Inicio </a>
         </li>
       </ul>
     </header>
@@ -48,7 +43,7 @@
       <div class="row justify-content-md-center">
         <div class="col-md-8 text-center grid-margin">
           <h1>
-            <a href="/usuarios">
+            <a href="/obras">
               <i class="bi bi-arrow-left-circle"></i>
             </a>
             Detalles de la Obra
@@ -62,8 +57,8 @@
               Descripción de Obra: <%= obra.descripcion_obra %>
             </li>
             <li class="list-group-item">
-              Encargado: <%= obra.fecha_inicio %>
-            </li>
+              Encargado: <%= obra.diva_asignada_nombre || 'Sin asignar' %> 
+          </li>
           </ul>
         </div>
       </div>

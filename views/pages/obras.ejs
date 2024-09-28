@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <%- include('../includes/head') %>
+</head>
+  <body>
+    <%- include('../includes/header', { req: req }) %> 
+
+    <div class="container" style="margin-top: 80px !important">
+      <div class="row justify-content-md-center mb-5">
+        <div class="col-md-4 mb-5">
+          <h3 class="text-center">
+            Registrar Expediente
+            <hr />
+          </h3>
+          <form action="/obras" method="POST">
+            <div class="mb-3">
+              <label for="nombre_usuario" class="form-label">Obra</label>
+              <input type="text" name="nombre_usuario" class="form-control" />
+            </div>
+            <div class="mb-3">
+              <label for="descripcion_obra" class="form-label">Descripción de Obra</label>
+              <input type="text" name="descripcion_obra" class="form-control" />
+            </div>
+            <div class="mb-3">
+              <label for="diva_asignada">Responsable</label>
+              <select name="diva_asignada" class="form-select"> 
+                  <option value="">Seleccionar Encargado de Obra</option>
+                  <% divas.forEach(function(diva) { %>
+                      <option value="<%= diva.id_usuario %>"> <%= diva.nombre_usuario %></option> 
+                  <% }); %>
+              </select>
+          </div>
+          
+            <div class="d-grid gap-2 col-12 mx-auto mt-4 mb-4">
+              <button class="btn btn-primary" type="submit">Registrar Expediente</button>
+            </div>
+          </form>          
+        </div>
+
+        <div class="col-md-8 py-3 custom_table">
+          <h3 class="text-center">
+            Lista de Expedientes
+            <hr />
+          </h3>
+
+          <!-- Campo de búsqueda -->
+          <input
+            type="text"
+            id="filtro"
+            class="form-control"
+            placeholder="Buscar en la tabla..."
+            oninput="filtrarObras()"
+          />
+
+          <div class="table-responsive mt-3">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Obra</th>
+                  <th>Descripción Obra</th>
+                  <th>Encargado</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% let contador = 1; %>
+                <% obras.forEach(function(obra) { %>
+                  <tr>
+                    <th scope="row"><%= contador %></th>
+                    <td><%= obra.nombre_obra %></td>
+                    <td><%= obra.descripcion_obra %></td>
+                    <td><%= obra.diva_asignada_nombre || 'Sin asignar' %></td> 
+                    <td>
+                      <span style="display: flex; justify-content: space-between">
+                        <a
+                          class="btn btn-info info_especial"
+                          href="/detalles/<%= obra.id_obra %>"
+                          title="Ver Detalles de la Obra">
+                          <i class="bi bi-person-bounding-box"></i>
+                          Detalles
+                        </a>
+              
+                        <% if (req.session.user && req.session.user.rol === 'DIVA administrador') { %>
+                          <a
+                            class="btn btn-success success_especial"
+                            title="Editar datos de la Obra"
+                            href="/formulario-actualizar-obra/<%= obra.id_obra %>">
+                            <i class="bi bi-pencil-square"></i>
+                            Editar
+                          </a>
+                          <form
+                            action="/borrar-obra/<%= obra.id_obra %>"
+                            method="POST">
+                            <input type="hidden" name="_method" value="DELETE" />
+                            <button type="submit" class="btn btn-danger" onclick="return confirmarEliminacion()">
+                              <i class="bi bi-trash"></i>
+                              Eliminar
+                            </button>
+                          </form>
+                        <% } else if (req.session.user && req.session.user.rol === 'DIVA' && obra.diva_asignada == req.session.user.id_usuario) { %>
+                          <a
+                            class="btn btn-warning warning_especial"
+                            title="Check-in de la Obra"
+                            href="/check-in-obra/<%= obra.id_obra %>">
+                            <i class="bi bi-check2-circle"></i>
+                            Check-in
+                          </a>
+                        <% } %>
+                      </span>
+                    </td>
+                  </tr>
+                  <% contador++; %>
+                <% }); %>                  
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+    <button onclick="verUsuarios()">Ver Usuarios</button>
+
+<script>
+  function verUsuarios() {
+    window.location.href = '/usuarios';
+  }
+</script>
+
+    <%- include('../includes/scripts') %>
+    <script>
+      function confirmarEliminacion() {
+        return confirm("¿Estás seguro de que deseas eliminar este registro?");
+      }
+
+      function filtrarObras() {
+        const filtro = document.getElementById('filtro').value;
+
+        if (filtro.length >= 3) {
+          fetch(`/obras?filtro=${encodeURIComponent(filtro)}`)
+            .then(response => response.text())
+            .then(html => {
+              document.querySelector('tbody').innerHTML = 
+                new DOMParser().parseFromString(html, 'text/html').querySelector('tbody').innerHTML;
+            })
+            .catch(error => console.error('Error:', error));
+        } else {
+          // Si el filtro es menor a 3 caracteres, recarga la lista completa
+          fetch('/obras')
+            .then(response => response.text())
+            .then(html => {
+              document.querySelector('tbody').innerHTML = 
+                new DOMParser().parseFromString(html, 'text/html').querySelector('tbody').innerHTML;
+            })
+            .catch(error => console.error('Error:', error));
+        }
+      }
+    </script>
+  </body>
+</html>
