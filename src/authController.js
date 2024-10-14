@@ -18,8 +18,6 @@ export function cerrarSesion(req, res) {
     });
 }
 
-// ... otras funciones ...
-
 // Función para procesar el login
 export async function procesarLogin(req, res) {
     const { username, password } = req.body;
@@ -35,25 +33,19 @@ export async function procesarLogin(req, res) {
             const match = await bcrypt.compare(password, usuario.password_usuario);
 
             if (match) {
-                
-                const [rolesResult] = await pool.query(
-                    "SELECT rol FROM usuarios WHERE no_empleado = ?",
-                    [username]
-                );
-
-                if (rolesResult.length > 0) {
-                    usuario.rol = rolesResult[0].rol; 
-                    req.session.user = usuario; 
-
-                    // Redirigir según el rol del usuario
-                    if (usuario.rol === 'DIVA') {
-                        res.redirect("/mis-obras"); 
-                    } else {
-                        res.redirect("/obras"); 
-                    }
+                req.session.user = usuario; 
+                // Redirigir según el rol del usuario
+                if (usuario.rol === 'DIVA') {
+                    res.redirect("/mis-obras"); 
+                } else if (usuario.rol === 'DIVA administrador') {
+                    res.redirect("/obras"); 
+                } else if (usuario.rol === 'Ventanilla') {
+                    res.redirect("/ventanilla-unica"); 
                 } else {
-                    res.render("pages/login", { error: "Error al obtener el rol del usuario" });
+                    // Manejar el caso de un rol no válido
+                    res.render("pages/login", { error: "Rol de usuario no válido" });
                 }
+
             } else {
                 res.render("pages/login", { error: "Usuario o contraseña incorrectos" });
             }
@@ -71,9 +63,8 @@ export function mostrarRegistro(req, res) {
     res.render("pages/register");
 }
 
-// Función para procesar el registro de un nuevo usuario
 export async function procesarRegistro(req, res) {
-    const { no_empleado, password, email_usuario, nombre_usuario } = req.body;
+    const { no_empleado, password, email_usuario, nombre_usuario, rol } = req.body;  // Obtiene el valor de 'rol' de req.body
 
     try {
         // Verifica si el usuario ya existe
@@ -84,16 +75,15 @@ export async function procesarRegistro(req, res) {
 
         if (existente.length > 0) {
             // Si el usuario ya existe, muestra un error
-            res.render("register", { error: "El usuario ya existe" });
+            res.render("pages/register", { error: "El usuario ya existe" });
         } else {
             // Genera el hash de la contraseña
             const hashedPassword = await bcrypt.hash(password, 10);
 
             // Si el usuario no existe, crear uno nuevo con la contraseña cifrada
-            await pool.query(
-                "INSERT INTO usuarios (no_empleado, password_usuario, email_usuario, nombre_usuario) VALUES (?, ?, ?, ?)",
-                [no_empleado, hashedPassword, email_usuario, nombre_usuario]
-            );
+            const query = "INSERT INTO usuarios (no_empleado, password_usuario, email_usuario, nombre_usuario, rol) VALUES (?, ?, ?, ?, ?)";
+            await pool.query(query, [no_empleado, hashedPassword, email_usuario, nombre_usuario, rol]); 
+
             res.redirect("/login");
         }
     } catch (error) {
@@ -101,6 +91,3 @@ export async function procesarRegistro(req, res) {
         res.status(500).json({ error: "Error en el servidor" });
     }
 }
-
-
-

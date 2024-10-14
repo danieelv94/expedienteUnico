@@ -296,29 +296,15 @@ export const handleSubirFotos = async (req, res) => {  // Manejador de la ruta
     }
 };
 
-// Ruta para registrar el check-in de documentación
-export const registrarCheckInDocumentacion = async (req, res) => {
+
+
+export const obtenerDocumentos = async () => {
     try {
-        const obraId = req.params.id;
-        const usuarioId = req.session.user.id_usuario;
-        const documentacion = req.body.documentacion;
-
-        // Verificar si el usuario está asignado a la obra
-        const estaAsignado = await verificarAsignacionUsuario(obraId, usuarioId);
-        if (!estaAsignado) {
-            return res.status(403).send('No estás asignado a esta obra'); 
-        }
-
-        // Crear un nuevo registro de visita con la documentación
-        await pool.query(
-            'INSERT INTO visitas (obra_id, usuario_id, documentacion) VALUES (?, ?, ?)',
-            [obraId, usuarioId, documentacion]
-        );
-
-        res.redirect(`/check-in-obra/${obraId}`);
+        const [rows] = await pool.query("SELECT * FROM documentos");
+        return rows;
     } catch (error) {
-        console.error("Error al registrar check-in de documentación:", error);
-        res.status(500).json({ error: "Error al registrar check-in de documentación" });
+        console.error("Error al obtener Documentos:", error);
+        throw { status: 500, message: "Error al obtener Documentos" };
     }
 };
 
@@ -327,7 +313,6 @@ export default {
     subirFotos, // Exportar la configuración de Multer
     handleSubirFotos, // Exportar el manejador de la ruta 
     subirFotos,
-    registrarCheckInDocumentacion,
     mostrarObras, 
     agregarObra, 
     obtenerDetallesObraUpdate, 

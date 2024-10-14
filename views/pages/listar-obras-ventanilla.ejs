@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <%- include('../includes/head') %> 
+  <title>Obras Registradas</title>
+</head>
+<body>
+  <%- include('../includes/header', { req: req }) %> 
+
+  <div class="container" style="margin-top: 80px !important">
+    <h1 class="text-center">Obras Registradas</h1>
+
+    <div class="table-responsive mt-3">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Número de Obra</th>
+            <th>Nombre de la Obra</th>
+            <th>Fecha de Registro</th>
+            <th>Estado de la Documentación</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% obras.forEach(function(obra) { %>
+            <tr>
+              <td><%= obra.id_obra %></td>
+              <td><%= obra.nombre_obra %></td>
+              <td><%= obra.created_at.toLocaleDateString() %></td> 
+              <td>
+                <% if (obra.estado_documentacion === 'completo') { %>
+                  <span class="badge bg-success">Completo</span>
+                <% } else if (obra.estado_documentacion === 'incompleto') { %>
+                  <span class="badge bg-warning">Incompleto</span>
+                <% } else if (obra.estado_documentacion === 'no entregado') { %> <span class="badge bg-danger">No entregado</span>
+                <% } else { %>
+                  <span class="badge bg-danger">Pendiente</span>
+                <% } %>
+              </td>
+              <td>
+                <a href="/gestionar-documentacion/<%= obra.id_obra %>" class="btn btn-primary btn-sm">
+                  Gestionar Documentación
+                </a>
+              </td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <%- include('../includes/scripts') %> 
+</body>
+</html>

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <%- include('../includes/head') %> 
+  <title>Ventanilla Única</title>
+</head>
+<body>
+  <%- include('../includes/header', { req: req }) %> 
+
+  <div class="container" style="margin-top: 80px !important">
+    <h1 class="text-center">Ventanilla Única - Registro de Obras</h1>
+
+    <% if (typeof mensaje !== 'undefined') { %> 
+      <div class="alert alert-success mt-3" role="alert">
+          <%= mensaje %>
+          <a href="/gestionar-documentacion/<%= obraId %>" class="btn btn-secondary">Gestionar Documentación</a> 
+      </div>
+    <% } %>
+
+    <form action="/registrar-obra" method="POST">
+      <div class="mb-3">
+        <label for="nombre_obra" class="form-label">Nombre de la Obra:</label>
+        <input type="text" class="form-control" id="nombre_obra" name="nombre_obra" required>
+      </div>
+      <div class="mb-3">
+        <label for="descripcion_obra" class="form-label">Descripción:</label>
+        <textarea class="form-control" id="descripcion_obra" name="descripcion_obra"></textarea>
+      </div>
+
+      <h2>Documentos:</h2>
+
+      <% documentos.forEach(function(documento) { %>
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" name="documentos" id="<%= documento.nombre %>" value="<%= documento.id %>">
+          <label class="form-check-label" for="<%= documento.nombre %>">
+            <%= documento.nombre %>
+            <input type="text" class="form-control" name="observaciones_<%= documento.id %>" placeholder="Observaciones"> 
+          </label>
+        </div>
+      <% }); %>
+
+      <button type="submit" class="btn btn-primary">Registrar Obra</button>
+    </form>
+  </div>
+
+  <%- include('../includes/scripts') %> 
+</body>
+</html>

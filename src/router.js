@@ -20,59 +20,51 @@ const {
   obtenerDivas,
   obtenerObrasAsignadasAUsuario,
   verificarAsignacionUsuario,
-  subirFotos, // Configuración de Multer
-  handleSubirFotos, // Manejador de subida de fotos
+  subirFotos,
+  handleSubirFotos,
   registrarCheckInDocumentacion
 } = obraController;
 
+
+
 import { verificarAutenticacion } from './middleware.js'; 
+import ventanillaController from './ventanillaController.js'; 
+
+const { 
+  // mostrarVentanillaUnica,  <-- Elimina esta línea
+  registrarObra, 
+  gestionarDocumentacion,
+  actualizarObservaciones,
+} = ventanillaController;
 
 
 
 const router = express.Router();
 
+// Rutas de autenticación
 router.get("/login", mostrarLogin);
 router.post("/login", procesarLogin);
 router.get("/register", mostrarRegistro);
 router.post("/register", procesarRegistro);
-router.get("/logout", cerrarSesion);
 
-// Ruta para obras, protegida por el middleware y pasando req a filtrarObras
+
+// Ruta para obras, protegida por el middleware
 router.get("/obras", verificarAutenticacion, (req, res) => {
     filtrarObras(req, res); 
 });
 
 // Rutas para detalles y actualización de Obras
-router.get("/detalles/:id", async (req, res) => {
+router.get("/detalles/:id", verificarAutenticacion, async (req, res) => {
   try {
     const obra = await obtenerDetallesObra(req.params.id);
     res.render("pages/detalles_obra", { obra });
   } catch (error) {
-    console.error("Error en la ruta /detalles/:id:", error); // Registrar el error en la consola
-    res.status(error.status || 500).json({ error: error.message }); // Enviar una respuesta de error
+    console.error("Error en la ruta /detalles/:id:", error); 
+    res.status(error.status || 500).json({ error: error.message }); 
   }
 });
 
-
-//crear obras
-router.post("/obras", async (req, res) => {
-  try {
-    const { nombre_usuario, descripcion_obra, diva_asignada } = req.body;
-
-    await agregarObra({
-      nombre_obra: nombre_usuario, 
-      descripcion_obra: descripcion_obra, 
-      diva_asignada: diva_asignada
-    });
-    
-    res.redirect("/obras"); 
-  } catch (error) {
-    res.status(500).json({ error: "Error al agregar la obra" });
-    console.log()
-  }
-});
-
-// Ruta para la vista de "Mis Obras" (protegida por middleware y solo para DIVA usuario)
+// Ruta para la vista de "Mis Obras"
 router.get('/mis-obras', verificarAutenticacion, async (req, res) => {
   if (req.session.user.rol !== 'DIVA') {
       return res.status(403).send('No tienes permiso para acceder a esta página');
@@ -87,7 +79,8 @@ router.get('/mis-obras', verificarAutenticacion, async (req, res) => {
   }
 });
 
-router.get('/formulario-actualizar-obra/:id', async (req, res) => {
+// Ruta para formulario de actualizar obra
+router.get('/formulario-actualizar-obra/:id', verificarAutenticacion, async (req, res) => {
   try {
       const { obra, divas } = await obtenerDetallesObraUpdate(req.params.id); 
       res.render('pages/update_obra', { obra, divas }); 
@@ -96,6 +89,7 @@ router.get('/formulario-actualizar-obra/:id', async (req, res) => {
   }
 });
 
+// Actualizar obra
 router.post("/actualizar-obra/:id", verificarAutenticacion, async (req, res) => {
   try {
     await actualizarObra(req.params.id, req.body);
@@ -105,6 +99,7 @@ router.post("/actualizar-obra/:id", verificarAutenticacion, async (req, res) => 
   }
 });
 
+// Eliminar obra
 router.post("/borrar-obra/:id", verificarAutenticacion, async (req, res) => {
   try {
     await eliminarObra(req.params.id);
@@ -114,9 +109,7 @@ router.post("/borrar-obra/:id", verificarAutenticacion, async (req, res) => {
   }
 });
 
-
-
-// Ruta para la vista de check-in de obra (protegida por middleware)
+// Ruta para la vista de check-in de obra
 router.get('/check-in-obra/:id', verificarAutenticacion, async (req, res) => {
   try {
       const obra = await obtenerDetallesObra(req.params.id);
@@ -133,17 +126,17 @@ router.get('/check-in-obra/:id', verificarAutenticacion, async (req, res) => {
   }
 });
 
-// Ruta para subir fotos (protegida por middleware)
+// Ruta para subir fotos
 router.post('/subir-fotos/:id', verificarAutenticacion, subirFotos, handleSubirFotos);
 
-router.post('/check-in-documentacion/:id', verificarAutenticacion, async (req, res) => {
-  try {
-    await registrarCheckInDocumentacion(req, res); 
-  } catch (error) {
-    console.error("Error al registrar check-in de documentación:", error);
-    res.status(500).json({ error: "Error al registrar check-in de documentación" });
-  }
-});
+
+
+//Rutas para ventanilla Unica
+router.get("/ventanilla-unica", verificarAutenticacion, ventanillaController.mostrarVentanillaUnica); 
+router.post("/registrar-obra", verificarAutenticacion, ventanillaController.registrarObra);  // <-- Corregido
+router.get("/gestionar-documentacion/:id", verificarAutenticacion, ventanillaController.gestionarDocumentacion);  // <-- Corregido
+router.post("/actualizar-observaciones/:id", verificarAutenticacion, ventanillaController.actualizarObservaciones);  // <-- Corregido
+router.get("/listar-obras-ventanilla", verificarAutenticacion, ventanillaController.listarObrasVentanilla);
 
 // Ruta para cerrar sesión
 router.get("/logout", cerrarSesion);
