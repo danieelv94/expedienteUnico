@@ -6,7 +6,6 @@ import obraController from './obraController.js';
 const { obtenerDetallesObra } = obraController;
 
 export const mostrarVentanillaUnica = async (req, res) => {
-    console.log("Ejecutando mostrarVentanillaUnica");
     if (req.session.user.rol !== 'Ventanilla') {
         return res.status(403).send('No tienes permiso para acceder a esta página');
     }

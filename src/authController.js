@@ -41,6 +41,10 @@ export async function procesarLogin(req, res) {
                     res.redirect("/obras"); 
                 } else if (usuario.rol === 'Ventanilla') {
                     res.redirect("/ventanilla-unica"); 
+                } else if (usuario.rol === 'AVANCE') { // <-- Agregar esta condición
+                    res.redirect("/avance"); // <-- Redirigir a la vista de avances
+                } else if (usuario.rol === 'Admin AVANCE') { // <-- Agregar esta condición
+                    res.redirect("/editar-avance"); // <-- Redirigir a la vista de avances
                 } else {
                     // Manejar el caso de un rol no válido
                     res.render("pages/login", { error: "Rol de usuario no válido" });

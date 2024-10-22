@@ -29,3 +29,25 @@ form {
   min-width: 95% !important;
   margin: 0 auto;
 }
+
+.checkbox {
+  width: 20px; /* Ajusta el tamaño según sea necesario */
+  height: 20px; /* Ajusta el tamaño según sea necesario */
+}
+
+/* Centrar los checkboxes en las celdas de la tabla */
+td {
+  text-align: center;
+}
+
+tr {
+  text-align: center;
+}
+
+.checkbox:checked {
+  accent-color: green;
+}
+
+.checkbox:not(:checked) {
+  accent-color: red;
+}

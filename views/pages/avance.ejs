@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <%- include('../includes/head') %>
+    <title>Avances de Obra</title>
+  </head>
+  <body>
+    <%- include('../includes/header', { req: req }) %>
+
+    <div class="container" style="margin-top: 80px !important">
+      <h1 class="text-center">Avances de Obra</h1>
+
+      <div class="mb-3">
+        <label for="fuente" class="form-label">Selecciona una fuente de financiamiento:</label>
+        <select id="fuente" class="form-select" onchange="cargarObras()">
+          <option value="">Seleccionar fuente</option>
+          <% fuentesFinanciamiento.forEach(function(fuente) { %>
+          <option value="<%= fuente %>"><%= fuente %></option>
+          <% }); %>
+        </select>
+      </div>
+
+      <div class="mb-3">
+        <label for="obra" class="form-label">Selecciona una obra:</label>
+        <select id="obra" class="form-select" onchange="cargarInformacionObra()">
+          <option value="">Seleccionar obra</option>
+        </select>
+      </div>
+
+      <div id="informacionObra" style="display: none;">
+        <h2>Información de la obra: <span id="nombreObra"></span></h2>
+        <p>Porcentaje de avance: <span id="porcentajeAvance"></span>%</p>
+        <p>Porcentaje físico: <span id="porcentajeFisico"></span>%</p>
+        <p>Porcentaje financiero: <span id="porcentajeFinanciero"></span>%</p>
+
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Actividades del Proceso</th>
+              <th>Responsable</th>
+              <th>Planeado</th>
+              <th>Avance</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% 
+              const documentacion = [
+                "Cartera de Proyectos",
+                "Precios ordinarios",
+                "Expediente técnico validado",
+                "Oficio de Autorización",
+                "Proceso de licitación",
+                "Oficio de Economías",
+                "Contrato",
+                "Convenio",
+                "Trámite de Anticipo",
+                "Convenio de Diferimiento",
+                "Est. 1",
+                "Est. 2",
+                "Est. 3",
+                "Est. 4",
+                "Finiquito"
+              ];
+              const responsables = [
+                "DPE",
+                "DPE",
+                "DIVA",
+                "DPE",
+                "DPE",
+                "DPE",
+                "DJ",
+                "DJ-DIH",
+                "DIH-DPE",
+                "DIH-DJ-DPE",
+                "DIH -DPE- SH",
+                "DIH -DPE- SH",
+                "DIH -DPE- SH",
+                "DIH -DPE- SH",
+                "DIH -DPE- SH"
+              ];
+
+              for (let i = 1; i <= 15; i++) { 
+            %>
+              <tr>
+                <td><%= documentacion[i - 1] %></td>
+                <td><%= responsables[i - 1] %></td>
+                <td><input type="checkbox" id="check1_<%= i %>" class="checkbox" disabled></td>
+                <td><input type="checkbox" id="check2_<%= i %>" class="checkbox" disabled></td>
+              </tr>
+            <% } %>
+          </tbody>
+        </table>
+        <p>Observaciones: <span id="observaciones"></span></p>
+      </div>
+    </div>
+
+    <%- include('../includes/scripts') %>
+    <script>
+      function cargarObras() {
+        const fuente = document.getElementById('fuente').value;
+        const obraSelect = document.getElementById('obra');
+        obraSelect.innerHTML = '<option value="">Seleccionar obra</option>'; // Limpiar opciones
+
+        if (fuente) {
+          // Realizar la petición AJAX para obtener las obras de la fuente seleccionada
+          fetch(`/obtener-obras-avance-por-fuente/${encodeURIComponent(fuente)}`)
+            .then(response => response.json())
+            .then(obras => {
+              obras.forEach(obra => {
+                const option = document.createElement('option');
+                option.value = obra.nombre_obra;
+                option.text = obra.nombre_obra;
+                obraSelect.add(option);
+              });
+            })
+            .catch(error => console.error('Error al cargar obras:', error));
+        }
+      }
+
+      function cargarInformacionObra() {
+        const nombreObra = document.getElementById('obra').value;
+
+        if (nombreObra) {
+          // Realizar la petición AJAX
+          fetch(`/obtener-informacion-obra/${encodeURIComponent(nombreObra)}`)
+            .then(response => response.json())
+            .then(data => {
+              if (data) {
+                document.getElementById('nombreObra').textContent = nombreObra;
+                document.getElementById('porcentajeAvance').textContent = data.porcentaje_avance;
+                document.getElementById('porcentajeFisico').textContent = data.porcentaje_fisico || 0; // Si no existe, asignar 0
+                document.getElementById('porcentajeFinanciero').textContent = data.porcentaje_financiero || 0; // Si no existe, asignar 0
+                document.getElementById('observaciones').textContent = data.observaciones || ''; // Mostrar observaciones o un espacio en blanco si no hay
+
+                // Actualizar la tabla con la información de la obra
+                for (let i = 1; i <= 15; i++) {
+                  const check1 = document.getElementById(`check1_${i}`);
+                  const check2 = document.getElementById(`check2_${i}`);
+
+                  check1.checked = data[`check${i}_1`] || false;
+                  if (check1.checked) {
+                    check1.style.backgroundColor = 'green'; 
+                  } else {
+                    check1.style.backgroundColor = 'red';
+                  }
+
+                  check2.checked = data[`check${i}_2`] || false;
+                  if (check2.checked) {
+                    check2.style.backgroundColor = 'green'; 
+                  } else {
+                    check2.style.backgroundColor = 'red';
+                  }
+                }
+    
+                document.getElementById('informacionObra').style.display = 'block';
+              } else {
+                // Manejar el caso en que la obra no se encuentra
+                alert('Obra no encontrada');
+              }
+            })
+            .catch(error => console.error('Error:', error));
+        } else {
+          document.getElementById('informacionObra').style.display = 'none';
+        }
+      }
+    </script>
+  </body>
+</html>

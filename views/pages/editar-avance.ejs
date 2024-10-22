@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <%- include('../includes/head') %>
+    <title>Editar Avances de Obra</title>
+  </head>
+  <body>
+    <%- include('../includes/header', { req: req }) %>
+
+    <div class="container" style="margin-top: 80px !important">
+      <h1 class="text-center">Editar Avances de Obra</h1>
+
+      <div class="mb-3">
+        <label for="fuente" class="form-label">Selecciona una fuente de financiamiento:</label>
+        <select id="fuente" class="form-select" onchange="cargarObras()">
+          <option value="">Seleccionar fuente</option>
+          <% fuentesFinanciamiento.forEach(function(fuente) { %>
+          <option value="<%= fuente %>"><%= fuente %></option>
+          <% }); %>
+        </select>
+      </div>
+
+      <div class="mb-3">
+        <label for="obra" class="form-label">Selecciona una obra:</label>
+        <select id="obra" class="form-select" onchange="cargarInformacionObra()">
+          <option value="">Seleccionar obra</option>
+        </select>
+      </div>
+
+      <form id="formularioAvance" method="POST">
+        <div id="informacionObra" style="display: none;">
+          <h2>Información de la obra: <span id="nombreObra"></span></h2>
+
+          <div class="mb-3">
+            <label for="porcentajeAvance" class="form-label">Porcentaje de avance:</label>
+            <input type="number" class="form-control" id="porcentajeAvance" name="porcentajeAvance" min="0" max="100">
+          </div>
+          <div class="mb-3">
+            <label for="porcentajeFisico" class="form-label">Porcentaje físico:</label>
+            <input type="number" class="form-control" id="porcentajeFisico" name="porcentajeFisico" min="0" max="100">
+          </div>
+          <div class="mb-3">
+            <label for="porcentajeFinanciero" class="form-label">Porcentaje financiero:</label>
+            <input type="number" class="form-control" id="porcentajeFinanciero" name="porcentajeFinanciero" min="0" max="100">
+          </div>
+
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Actividades del Proceso</th>
+                <th>Responsable</th>
+                <th>Planeado</th>
+                <th>Avance</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% 
+                const documentacion = [
+                  "Cartera de Proyectos",
+                  "Precios ordinarios",
+                  "Expediente técnico validado",
+                  "Oficio de Autorización",
+                  "Proceso de licitación",
+                  "Oficio de Economías",
+                  "Contrato",
+                  "Convenio",
+                  "Trámite de Anticipo",
+                  "Convenio de Diferimiento",
+                  "Est. 1",
+                  "Est. 2",
+                  "Est. 3",
+                  "Est. 4",
+                  "Finiquito"
+                ];
+                const responsables = [
+                  "DPE",
+                  "DPE",
+                  "DIVA",
+                  "DPE",
+                  "DPE",
+                  "DPE",
+                  "DJ",
+                  "DJ-DIH",
+                  "DIH-DPE",
+                  "DIH-DJ-DPE",
+                  "DIH -DPE- SH",
+                  "DIH -DPE- SH",
+                  "DIH -DPE- SH",
+                  "DIH -DPE- SH",
+                  "DIH -DPE- SH"
+                ];
+
+                for (let i = 1; i <= 15; i++) { 
+              %>
+                <tr>
+                  <td><%= documentacion[i - 1] %></td>
+                  <td><%= responsables[i - 1] %></td>
+                  <td><input type="checkbox" name="check<%= i %>_1" id="check1_<%= i %>" class="checkbox"></td> 
+                  <td><input type="checkbox" name="check<%= i %>_2" id="check2_<%= i %>" class="checkbox"></td> 
+                </tr>
+              <% } %>
+            </tbody>
+          </table>
+          <div class="mb-3">
+            <label for="observaciones" class="form-label">Observaciones:</label>
+            <textarea class="form-control" id="observaciones" name="observaciones"></textarea>   
+          </div>
+          <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+        </div>
+      </form>
+    </div>
+
+    <%- include('../includes/scripts') %>
+    <script>
+      function cargarObras() {
+        const fuente = document.getElementById('fuente').value;
+        const obraSelect = document.getElementById('obra');
+        obraSelect.innerHTML = '<option value="">Seleccionar obra</option>'; // Limpiar opciones
+
+        if (fuente) {
+          // Realizar la petición AJAX para obtener las obras de la fuente seleccionada
+          fetch(`/obtener-obras-avance-por-fuente/${encodeURIComponent(fuente)}`) // Corrección aquí
+            .then(response => response.json())
+            .then(obras => {
+              obras.forEach(obra => {
+                const option = document.createElement('option');
+                option.value = obra.nombre_obra;
+                option.text = obra.nombre_obra;
+                obraSelect.add(option);
+              });
+            })
+            .catch(error => console.error('Error al cargar obras:', error));
+        }
+      }
+
+      function cargarInformacionObra() {
+        const nombreObra = document.getElementById('obra').value;
+
+        if (nombreObra) {
+          // Realizar la petición AJAX
+          fetch(`/obtener-informacion-obra/${encodeURIComponent(nombreObra)}`) // Corrección aquí
+            .then(response => response.json())
+            .then(data => {
+              console.log("Información de la obra:", data); // Agregar esta línea para depurar
+              if (data) {
+                document.getElementById('nombreObra').textContent = nombreObra;
+
+                // Llenar los campos del formulario con la información de la obra
+                document.getElementById('porcentajeAvance').value = data.porcentaje_avance;
+                document.getElementById('porcentajeFisico').value = data.porcentaje_fisico || 0; // Si no existe, asignar 0
+                document.getElementById('porcentajeFinanciero').value = data.porcentaje_financiero || 0; // Si no existe, asignar 0
+                document.getElementById('observaciones').value = data.observaciones || ''; // Mostrar observaciones o un espacio en blanco si no hay
+
+
+                // Actualizar la tabla con la información de la obra
+                for (let i = 1; i <= 15; i++) {
+                  document.getElementById(`check1_${i}`).checked = data[`check${i}_1`] || false;
+                  document.getElementById(`check2_${i}`).checked = data[`check${i}_2`] || false;
+                }
+
+                document.getElementById('informacionObra').style.display = 'block';
+              } else {
+                // Manejar el caso en que la obra no se encuentra
+                alert('Obra no encontrada');
+              }
+            })
+            .catch(error => console.error('Error:', error));
+        } else {
+          document.getElementById('informacionObra').style.display = 'none';
+        }
+      }
+
+      // Manejar el envío del formulario
+      const form = document.getElementById('formularioAvance');
+      form.addEventListener('submit', function(event) {
+        event.preventDefault(); // Evitar que el formulario se envíe de forma predeterminada
+
+        const nombreObra = document.getElementById('nombreObra').textContent;
+
+        // Obtener los valores de los campos del formulario
+        const formData = new FormData(form);
+        const data = {};
+        formData.forEach((value, key) => (data[key] = value));
+
+        // Realizar la petición AJAX para guardar los cambios
+        fetch(`/guardar-avance/${encodeURIComponent(nombreObra)}`, { // Corrección aquí
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
+        })
+        .then(response => {
+  if (response.ok) {
+    Swal.fire({
+      icon: 'success',
+      title: 'Cambios guardados correctamente',
+      showConfirmButton: false,
+      timer: 1500
+    });
+        } else {
+            Swal.fire({
+            icon: 'error',
+            title: 'Error al guardar los cambios',
+            text: 'Por favor, inténtalo de nuevo más tarde.'
+            });
+        }
+        })
+        .catch(error => console.error('Error:', error));
+      });
+    </script>
+  </body>
+</html>

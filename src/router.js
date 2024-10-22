@@ -30,6 +30,18 @@ const {
 import { verificarAutenticacion } from './middleware.js'; 
 import ventanillaController from './ventanillaController.js'; 
 
+import avanceController from './avanceController.js'; 
+const { 
+    mostrarAvances, 
+    obtenerObrasAvance, 
+    obtenerInformacionObra, 
+    obtenerFuentesFinanciamiento, 
+    obtenerObrasAvancePorFuente,
+    mostrarEditarAvance, // Asegúrate de que esté aquí
+    guardarAvance 
+} = avanceController;
+
+
 const { 
   // mostrarVentanillaUnica,  <-- Elimina esta línea
   registrarObra, 
@@ -137,6 +149,45 @@ router.post("/registrar-obra", verificarAutenticacion, ventanillaController.regi
 router.get("/gestionar-documentacion/:id", verificarAutenticacion, ventanillaController.gestionarDocumentacion);  // <-- Corregido
 router.post("/actualizar-observaciones/:id", verificarAutenticacion, ventanillaController.actualizarObservaciones);  // <-- Corregido
 router.get("/listar-obras-ventanilla", verificarAutenticacion, ventanillaController.listarObrasVentanilla);
+
+// Ruta para la vista de avances (para rol "AVANCE")
+router.get('/avance', verificarAutenticacion, async (req, res) => {
+  try {
+    const obras = await obtenerObrasAvance();
+    const fuentesFinanciamiento = await obtenerFuentesFinanciamiento(); // Obtener fuentes de financiamiento
+    res.render("pages/avance", { obras, fuentesFinanciamiento, req: req }); // Pasar fuentes a la vista
+  } catch (error) {
+    res.status(error.status || 500).json({ error: error.message });
+  }
+}); 
+
+// Ruta para obtener la información de la obra por AJAX
+router.get('/obtener-informacion-obra/:nombre', verificarAutenticacion, async (req, res) => {
+  try {
+    const nombreObra = req.params.nombre;
+    const informacionObra = await obtenerInformacionObra(nombreObra);
+    res.json(informacionObra);
+  } catch (error) {
+    res.status(error.status || 500).json({ error: error.message });
+  }
+});
+
+// Ruta para obtener las obras por fuente de financiamiento
+router.get('/obtener-obras-avance-por-fuente/:fuente', verificarAutenticacion, async (req, res) => {
+  try {
+    const fuente = req.params.fuente;
+    const obras = await obtenerObrasAvancePorFuente(fuente);
+    res.json(obras);
+  } catch (error) {
+    res.status(error.status || 500).json({ error: error.message });
+  }
+});
+
+// Ruta para la vista de editar avances (para rol "Admin AVANCE")
+router.get('/editar-avance', verificarAutenticacion, mostrarEditarAvance);
+
+// Ruta para guardar los cambios en la información de la obra
+router.post('/guardar-avance/:nombre', verificarAutenticacion, guardarAvance);
 
 // Ruta para cerrar sesión
 router.get("/logout", cerrarSesion);
