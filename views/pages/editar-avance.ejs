@@ -30,18 +30,21 @@
       <form id="formularioAvance" method="POST">
         <div id="informacionObra" style="display: none;">
           <h2>Información de la obra: <span id="nombreObra"></span></h2>
-
+          <div class="mb-3">
+            <label for="contratista" class="form-label">Contratista:</label>
+            <input type="text" class="form-control" id="contratista" name="contratista">
+          </div>
           <div class="mb-3">
             <label for="porcentajeAvance" class="form-label">Porcentaje de avance:</label>
-            <input type="number" class="form-control" id="porcentajeAvance" name="porcentajeAvance" min="0" max="100">
+            <input type="number" step="0.01" class="form-control" id="porcentajeAvance" name="porcentajeAvance" min="0" max="100">
           </div>
           <div class="mb-3">
             <label for="porcentajeFisico" class="form-label">Porcentaje físico:</label>
-            <input type="number" class="form-control" id="porcentajeFisico" name="porcentajeFisico" min="0" max="100">
+            <input type="number" step="0.01" class="form-control" id="porcentajeFisico" name="porcentajeFisico" min="0" max="100">
           </div>
           <div class="mb-3">
             <label for="porcentajeFinanciero" class="form-label">Porcentaje financiero:</label>
-            <input type="number" class="form-control" id="porcentajeFinanciero" name="porcentajeFinanciero" min="0" max="100">
+            <input type="number" step="0.01" class="form-control" id="porcentajeFinanciero" name="porcentajeFinanciero" min="0" max="100">
           </div>
 
           <table class="table">
@@ -146,6 +149,7 @@
                 document.getElementById('nombreObra').textContent = nombreObra;
 
                 // Llenar los campos del formulario con la información de la obra
+                document.getElementById('contratista').value = data.contratista;
                 document.getElementById('porcentajeAvance').value = data.porcentaje_avance;
                 document.getElementById('porcentajeFisico').value = data.porcentaje_fisico || 0; // Si no existe, asignar 0
                 document.getElementById('porcentajeFinanciero').value = data.porcentaje_financiero || 0; // Si no existe, asignar 0

@@ -65,7 +65,8 @@ export const obtenerFuentesFinanciamiento = async () => {
           oa.porcentaje_avance,
           oa.porcentaje_fisico,
           oa.porcentaje_financiero,
-          oa.observaciones
+          oa.observaciones,
+          oa.contratista
         FROM obras_avance oa
         WHERE oa.nombre_obra = ?`,
         [nombreObra]
@@ -78,6 +79,7 @@ export const obtenerFuentesFinanciamiento = async () => {
   
       return {
         ...obra,
+        contratista: obra.contratista,
         porcentajeAvance: obra.porcentaje_avance,
         porcentajeFisico: obra.porcentaje_fisico,
         porcentajeFinanciero: obra.porcentaje_financiero
@@ -132,8 +134,8 @@ export const obtenerFuentesFinanciamiento = async () => {
         values.push(data[`check${i}_2`] === 'on' ? 1 : 0);
       }
       // Agregar la columna 'observaciones' y su valor
-      sql += "porcentaje_avance = ?, porcentaje_fisico = ?, porcentaje_financiero = ?, observaciones = ? WHERE nombre_obra = ?";
-      values.push(data.porcentajeAvance, data.porcentajeFisico, data.porcentajeFinanciero, data.observaciones, nombreObra);
+      sql += "contratista = ?,porcentaje_avance = ?, porcentaje_fisico = ?, porcentaje_financiero = ?, observaciones = ? WHERE nombre_obra = ?";
+      values.push(data.contratista,data.porcentajeAvance, data.porcentajeFisico, data.porcentajeFinanciero, data.observaciones, nombreObra);
 
       // Ejecutar la consulta SQL
       await pool.query(sql, values);

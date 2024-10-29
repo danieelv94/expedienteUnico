@@ -29,6 +29,7 @@
 
       <div id="informacionObra" style="display: none;">
         <h2>Información de la obra: <span id="nombreObra"></span></h2>
+        <p>Contratista: <span id="contratista"></span></p>
         <p>Porcentaje de avance: <span id="porcentajeAvance"></span>%</p>
         <p>Porcentaje físico: <span id="porcentajeFisico"></span>%</p>
         <p>Porcentaje financiero: <span id="porcentajeFinanciero"></span>%</p>
@@ -127,6 +128,7 @@
             .then(data => {
               if (data) {
                 document.getElementById('nombreObra').textContent = nombreObra;
+                document.getElementById('contratista').textContent = data.contratista;
                 document.getElementById('porcentajeAvance').textContent = data.porcentaje_avance;
                 document.getElementById('porcentajeFisico').textContent = data.porcentaje_fisico || 0; // Si no existe, asignar 0
                 document.getElementById('porcentajeFinanciero').textContent = data.porcentaje_financiero || 0; // Si no existe, asignar 0
