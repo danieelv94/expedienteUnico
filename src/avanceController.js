@@ -42,6 +42,12 @@ export const obtenerFuentesFinanciamiento = async () => {
     }
   };
   
+  export const calcularSaldoAPagar = (obra) => {
+    const { monto_contrato, monto_anticipo, monto_convenio, monto_est1, monto_est2, monto_est3, monto_est4 } = obra;
+    const totalEstimaciones = monto_est1 + monto_est2 + monto_est3 + monto_est4;
+    const saldo = monto_contrato - monto_anticipo - monto_convenio - totalEstimaciones;
+    return saldo;
+  };
   export const obtenerInformacionObra = async (nombreObra) => {
     try {
       // Consulta para obtener la información de la obra, incluyendo el porcentaje de avance

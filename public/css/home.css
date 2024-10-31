@@ -30,7 +30,7 @@ form {
   margin: 0 auto;
 }
 
-.checkbox {
+.checkboxa {
   width: 20px; /* Ajusta el tamaño según sea necesario */
   height: 20px; /* Ajusta el tamaño según sea necesario */
 }
@@ -44,10 +44,43 @@ tr {
   text-align: center;
 }
 
-.checkbox:checked {
+.checkboxa:checked {
   accent-color: green;
 }
 
-.checkbox:not(:checked) {
-  accent-color: red;
-}
+
+  /* Ocultar el checkbox real */
+  .checkbox {
+    display: none;
+  }
+
+  /* Estilos para el label que actúa como checkbox */
+  .checkbox + label {
+    display: inline-block;
+    width: 20px;        /* Ancho del checkbox */
+    height: 20px;       /* Alto del checkbox */
+    border-radius: 4px;
+    position: relative;
+    cursor: pointer;
+  }
+
+  /* Pseudo-elemento para la palomita */
+  .checkbox:checked + label::before {
+    content: "✓";           /* Palomita */
+    color: white;
+    font-size: 16px;
+    position: absolute;
+    top: 0;
+    background-color: green; /* Fondo verde */
+    width: 100%;              /* Llenar el contenedor */
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+
+
+
+
+

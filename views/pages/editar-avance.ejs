@@ -6,7 +6,7 @@
   </head>
   <body>
     <%- include('../includes/header', { req: req }) %>
-
+    
     <div class="container" style="margin-top: 80px !important">
       <h1 class="text-center">Editar Avances de Obra</h1>
 
@@ -98,8 +98,8 @@
                 <tr>
                   <td><%= documentacion[i - 1] %></td>
                   <td><%= responsables[i - 1] %></td>
-                  <td><input type="checkbox" name="check<%= i %>_1" id="check1_<%= i %>" class="checkbox"></td> 
-                  <td><input type="checkbox" name="check<%= i %>_2" id="check2_<%= i %>" class="checkbox"></td> 
+                  <td><input type="checkbox" name="check<%= i %>_1" id="check1_<%= i %>" class="checkboxa"></td> 
+                  <td><input type="checkbox" name="check<%= i %>_2" id="check2_<%= i %>" class="checkboxa"></td> 
                 </tr>
               <% } %>
             </tbody>
