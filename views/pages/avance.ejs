@@ -10,94 +10,55 @@
     <div class="container" style="margin-top: 80px !important">
       <h1 class="text-center">Avances de Obra</h1>
 
-      <div class="mb-3">
-        <label for="fuente" class="form-label">Selecciona una fuente de financiamiento:</label>
-        <select id="fuente" class="form-select" onchange="cargarObras()">
-          <option value="">Seleccionar fuente</option>
-          <% fuentesFinanciamiento.forEach(function(fuente) { %>
-          <option value="<%= fuente %>"><%= fuente %></option>
-          <% }); %>
-        </select>
-      </div>
-
-      <div class="mb-3">
-        <label for="obra" class="form-label">Selecciona una obra:</label>
-        <select id="obra" class="form-select" onchange="cargarInformacionObra()">
-          <option value="">Seleccionar obra</option>
-        </select>
-      </div>
-
+      <div class="selector-container"> 
+        <div> 
+          <label for="fuente" class="form-label">Fuente de Financiamiento:</label>
+          <select id="fuente" class="form-select" onchange="cargarObras()">
+            <option value="">Seleccionar fuente</option>
+            <% fuentesFinanciamiento.forEach(function(fuente) { %>
+              <option value="<%= fuente %>"><%= fuente %></option>
+            <% }); %>
+          </select>
+        </div>
+        <div> 
+          <label for="obra" class="form-label">Obra:</label>
+          <select id="obra" class="form-select" onchange="cargarInformacionObra()">
+            <option value="">Seleccionar obra</option>
+          </select>
+        </div>
+      </div> 
+      <br>
       <div id="informacionObra" style="display: none;">
-        <h2>Información de la obra: <span id="nombreObra"></span></h2>
-        <p>Contratista: <span id="contratista"></span></p>
-        <p>Porcentaje de avance: <span id="porcentajeAvance"></span>%</p>
-        <p>Porcentaje físico: <span id="porcentajeFisico"></span>%</p>
-        <p>Porcentaje financiero: <span id="porcentajeFinanciero"></span>%</p>
+        <div class="card">
+          <div class="card-header">
+            Información de la Obra
+          </div>
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item">
+              <h3 id="nombreObra"></h3>
+            </li>
+            <li class="list-group-item">
+              Contratista: <span id="contratista"></span>
+            </li>
+            <li class="list-group-item">
+              Porcentaje de avance: <span id="porcentajeAvance"></span>%
+            </li>
+            <li class="list-group-item">
+              Porcentaje físico: <span id="porcentajeFisico"></span>%
+            </li>
+            <li class="list-group-item">
+              Porcentaje financiero: <span id="porcentajeFinanciero"></span>%
+            </li>
+          </ul>
+          <div class="table-responsive"> 
 
-        <table class="table">
-          <thead>
-            <tr>
-              <th>Actividades del Proceso</th>
-              <th>Responsable</th>
-              <th>Planeado</th>
-              <th>Avance</th>
-            </tr>
-          </thead>
-          <tbody>
-            <% 
-              const documentacion = [
-                "Cartera de Proyectos",
-                "Precios ordinarios",
-                "Expediente técnico validado",
-                "Oficio de Autorización",
-                "Proceso de licitación",
-                "Oficio de Economías",
-                "Contrato",
-                "Convenio",
-                "Trámite de Anticipo",
-                "Convenio de Diferimiento",
-                "Est. 1",
-                "Est. 2",
-                "Est. 3",
-                "Est. 4",
-                "Finiquito"
-              ];
-              const responsables = [
-                "DPE",
-                "DPE",
-                "DIVA",
-                "DPE",
-                "DPE",
-                "DPE",
-                "DJ",
-                "DJ-DIH",
-                "DIH-DPE",
-                "DIH-DJ-DPE",
-                "DIH -DPE- SH",
-                "DIH -DPE- SH",
-                "DIH -DPE- SH",
-                "DIH -DPE- SH",
-                "DIH -DPE- SH"
-              ];
-
-              for (let i = 1; i <= 15; i++) { 
-            %>
-              <tr>
-                <td><%= documentacion[i - 1] %></td>
-                <td><%= responsables[i - 1] %></td>
-                <td>
-                  <input type="checkbox" id="check1_<%= i %>" class="checkbox" disabled> 
-                  <label for="check1_<%= i %>"></label> 
-                </td>
-                <td>
-                  <input type="checkbox" id="check2_<%= i %>" class="checkbox" disabled>
-                  <label for="check2_<%= i %>"></label> 
-                </td>
-              </tr>
-            <% } %>
-          </tbody>
-        </table>
-        <p>Observaciones: <span id="observaciones"></span></p>
+            <div id="tablaObra"> </div> 
+  
+          </div>
+          <div class="card-footer">
+            <p>Observaciones: <span id="observaciones"></span></p>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -106,10 +67,9 @@
       function cargarObras() {
         const fuente = document.getElementById('fuente').value;
         const obraSelect = document.getElementById('obra');
-        obraSelect.innerHTML = '<option value="">Seleccionar obra</option>'; // Limpiar opciones
+        obraSelect.innerHTML = '<option value="">Seleccionar obra</option>'; 
 
         if (fuente) {
-          // Realizar la petición AJAX para obtener las obras de la fuente seleccionada
           fetch(`/obtener-obras-avance-por-fuente/${encodeURIComponent(fuente)}`)
             .then(response => response.json())
             .then(obras => {
@@ -123,6 +83,7 @@
             .catch(error => console.error('Error al cargar obras:', error));
         }
       }
+
       function cargarInformacionObra() {
   const nombreObra = document.getElementById('obra').value;
 
@@ -137,19 +98,29 @@
           document.getElementById('porcentajeFisico').textContent = data.porcentaje_fisico || '0';
           document.getElementById('porcentajeFinanciero').textContent = data.porcentaje_financiero || '0';
           document.getElementById('observaciones').textContent = data.observaciones || 'Sin observaciones';
+          
+          // Generar la tabla dinámicamente
+          const tablaHTML = `
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>Actividades del Proceso</th>
+                  <th>Responsable</th>
+                  <th>Planeado</th>
+                  <th>Avance</th>
+                  <th>Monto</th> 
+                </tr>
+              </thead>
+              <tbody>
+                ${generarFilasTabla(data)} 
+                <tr> 
+                  <td colspan="4">Saldo a pagar:</td>
+                  <td><span id="saldoAPagar">${calcularSaldoAPagar(data)}</span></td>
+                </tr>
+              </tbody>
+            </table>`;
 
-          // Actualiza los checkboxes y aplica el fondo verde si están marcados
-          for (let i = 1; i <= 15; i++) {
-            const check1 = document.getElementById(`check1_${i}`);
-            const check2 = document.getElementById(`check2_${i}`);
-
-            check1.checked = !!data[`check${i}_1`];
-            check2.checked = !!data[`check${i}_2`];
-
-            // Asegúrate de que estás en el <td> y aplica la clase solo cuando esté marcado
-            check1.closest('td').classList.toggle('td-checked', check1.checked);
-            check2.closest('td').classList.toggle('td-checked', check2.checked);
-          }
+          document.getElementById('tablaObra').innerHTML = tablaHTML;
 
           document.getElementById('informacionObra').style.display = 'block';
         } else {
@@ -163,6 +134,110 @@
   }
 }
 
+function generarFilasTabla(obra) {
+  const documentacion = [
+    "Cartera de Proyectos",
+    "Precios ordinarios",
+    "Expediente técnico validado",
+    "Oficio de Autorización",
+    "Proceso de licitación",
+    "Oficio de Economías",
+    "Contrato",
+    "Convenio",
+    "Trámite de Anticipo",
+    "Convenio de Diferimiento",
+    "Est. 1",
+    "Est. 2",
+    "Est. 3",
+    "Est. 4",
+    "Finiquito"
+  ];
+  const responsables = [
+    "DPE",
+    "DPE",
+    "DIVA",
+    "DPE",
+    "DPE",
+    "DPE",
+    "DJ",
+    "DJ-DIH",
+    "DIH-DPE",
+    "DIH-DJ-DPE",
+    "DIH -DPE- SH",
+    "DIH -DPE- SH",
+    "DIH -DPE- SH",
+    "DIH -DPE- SH",
+    "DIH -DPE- SH"
+  ];
+
+  let filasHTML = "";
+  for (let i = 1; i <= 15; i++) {
+    filasHTML += `
+      <tr>
+        <td>${documentacion[i - 1]}</td>
+        <td>${responsables[i - 1]}</td>
+        <td>
+          <input type="checkbox" id="check1_${i}" class="checkbox" disabled ${obra[`check${i}_1`] ? 'checked' : ''}>
+          <label for="check1_${i}"></label> 
+        </td>
+        <td>
+          <input type="checkbox" id="check2_${i}" class="checkbox" disabled ${obra[`check${i}_2`] ? 'checked' : ''}>
+          <label for="check2_${i}"></label> 
+        </td>
+        <td>`;
+
+    // Mostrar los montos en las filas correspondientes, excepto Convenio de Diferimiento
+    let monto = 0;
+    switch (i) {
+      case 7: // Contrato
+        monto = obra.monto_contrato || 0;
+        break;
+      case 9: // Trámite de Anticipo
+        monto = obra.monto_anticipo || 0;
+        break;
+      case 11: // Est. 1
+      case 12: // Est. 2
+      case 13: // Est. 3
+      case 14: // Est. 4
+        monto = obra[`monto_est${i - 10}`] || 0; 
+        break;
+      case 15: // Finiquito
+        monto = obra.monto_finiquito || 0;
+        break;
+    }
+
+    // Formatear el monto con separadores de miles
+    const montoFormateado = formatearNumero(monto);
+
+    filasHTML += `${(i === 7 || i === 9 ||  (i >= 11 && i <= 14) || i === 15) ? montoFormateado : ''}
+        </td>
+      </tr>`;
+  }
+  return filasHTML;
+}
+
+function calcularSaldoAPagar(obra) {
+  // Obtener los valores de los montos y convertirlos a números
+  const montoContrato = parseFloat(obra.monto_contrato) || 0;
+  const montoAnticipo = parseFloat(obra.monto_anticipo) || 0;
+  // const montoConvenio = parseFloat(obra.monto_convenio) || 0; // No se usa monto_convenio
+  const montoEst1 = parseFloat(obra.monto_est1) || 0;
+  const montoEst2 = parseFloat(obra.monto_est2) || 0;
+  const montoEst3 = parseFloat(obra.monto_est3) || 0;
+  const montoEst4 = parseFloat(obra.monto_est4) || 0;
+  const montoFiniquito = parseFloat(obra.monto_finiquito) || 0;
+
+  // Calcular el total de las estimaciones
+  const totalEstimaciones = montoEst1 + montoEst2 + montoEst3 + montoEst4;
+
+  // Calcular el saldo a pagar
+  const saldo = montoContrato - montoAnticipo - totalEstimaciones - montoFiniquito;
+
+  return formatearNumero(saldo.toFixed(2)); 
+}
+function formatearNumero(numero) {
+  return numero.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
     </script>
   </body>
 </html>

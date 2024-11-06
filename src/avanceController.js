@@ -1,12 +1,37 @@
 import pool from "./db.js";
 
 export const mostrarAvances = async (req, res) => {
-    if (req.session.user.rol !== 'AVANCE') {
-      return res.status(403).send('No tienes permiso para acceder a esta página');
-    }
+  if (req.session.user.rol !== 'AVANCE') {
+    return res.status(403).send('No tienes permiso para acceder a esta página');
+  }
   try {
     const obras = await obtenerObrasAvance();
-    res.render("pages/avance", { obras, req: req });
+    const fuentesFinanciamiento = await obtenerFuentesFinanciamiento();
+    
+    // Inicializar 'obra' con un objeto vacío o con valores por defecto
+    let obra = { 
+      monto_contrato: 0, 
+      monto_anticipo: 0, 
+      monto_est1: 0, 
+      monto_est2: 0, 
+      monto_est3: 0, 
+      monto_est4: 0,
+      monto_finiquito: 0,
+      // ... otras propiedades con valores por defecto ...
+    }; 
+
+    if (obras.length > 0) {
+      const nombreObra = obras[0].nombre_obra; 
+      obra = await obtenerInformacionObra(nombreObra);
+    }
+    console.log("Valor de obra:", obra);
+    res.render("pages/avance", { 
+      obras, 
+      fuentesFinanciamiento, 
+      obra: obra, 
+      req: req 
+    });
+
   } catch (error) {
     res.status(error.status || 500).json({ error: error.message });
   }
@@ -42,12 +67,7 @@ export const obtenerFuentesFinanciamiento = async () => {
     }
   };
   
-  export const calcularSaldoAPagar = (obra) => {
-    const { monto_contrato, monto_anticipo, monto_convenio, monto_est1, monto_est2, monto_est3, monto_est4 } = obra;
-    const totalEstimaciones = monto_est1 + monto_est2 + monto_est3 + monto_est4;
-    const saldo = monto_contrato - monto_anticipo - monto_convenio - totalEstimaciones;
-    return saldo;
-  };
+
   export const obtenerInformacionObra = async (nombreObra) => {
     try {
       // Consulta para obtener la información de la obra, incluyendo el porcentaje de avance
@@ -71,6 +91,13 @@ export const obtenerFuentesFinanciamiento = async () => {
           oa.porcentaje_avance,
           oa.porcentaje_fisico,
           oa.porcentaje_financiero,
+          oa.monto_contrato,
+          oa.monto_anticipo,
+          oa.monto_est1,
+          oa.monto_est2,
+          oa.monto_est3,
+          oa.monto_est4,
+          oa.monto_finiquito,
           oa.observaciones,
           oa.contratista
         FROM obras_avance oa
@@ -88,7 +115,14 @@ export const obtenerFuentesFinanciamiento = async () => {
         contratista: obra.contratista,
         porcentajeAvance: obra.porcentaje_avance,
         porcentajeFisico: obra.porcentaje_fisico,
-        porcentajeFinanciero: obra.porcentaje_financiero
+        porcentajeFinanciero: obra.porcentaje_financiero,
+        montoContrato: obra.monto_contrato,
+        montoAnticipo: obra.monto_anticipo,
+        montoEst1: obra.monto_est1,
+        montoEst2: obra.monto_est2,
+        montoEst3: obra.monto_est3,
+        montoEst4: obra.monto_est4,
+        montoFiniquito: obra.monto_finiquito
       };
     } catch (error) {
       console.error("Error al obtener información de la obra:", error);
@@ -140,8 +174,8 @@ export const obtenerFuentesFinanciamiento = async () => {
         values.push(data[`check${i}_2`] === 'on' ? 1 : 0);
       }
       // Agregar la columna 'observaciones' y su valor
-      sql += "contratista = ?,porcentaje_avance = ?, porcentaje_fisico = ?, porcentaje_financiero = ?, observaciones = ? WHERE nombre_obra = ?";
-      values.push(data.contratista,data.porcentajeAvance, data.porcentajeFisico, data.porcentajeFinanciero, data.observaciones, nombreObra);
+      sql += "monto_contrato = ?,monto_anticipo = ?,monto_est1 = ?,monto_est2 = ?,monto_est3 = ?,monto_est4 = ?,monto_finiquito = ?,contratista = ?,porcentaje_avance = ?, porcentaje_fisico = ?, porcentaje_financiero = ?, observaciones = ? WHERE nombre_obra = ?";
+      values.push(data.montoContrato,data.montoAnticipo,data.montoEst1,data.montoEst2,data.montoEst3,data.montoEst4,data.montoFiniquito,data.contratista,data.porcentajeAvance, data.porcentajeFisico, data.porcentajeFinanciero, data.observaciones, nombreObra);
 
       // Ejecutar la consulta SQL
       await pool.query(sql, values);

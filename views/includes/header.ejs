@@ -32,6 +32,15 @@
           <a class="menu-item" href="/listar-obras-ventanilla"> Listar Obras </a> 
         </li>
       <% } %> 
+
+      <% if (req.session.user && req.session.user.rol === 'AVANCE') { %>  
+        <li>
+          <a class="menu-item" href="/avance"> Avance </a> 
+        </li>
+        <li>
+          <a class="menu-item" href="/graficas"> Graficas </a> 
+        </li>
+      <% } %> 
       <li>
         <a class="menu-item" href="/logout"> Cerrar Sesión </a>
       </li>

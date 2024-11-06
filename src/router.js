@@ -25,8 +25,6 @@ const {
   registrarCheckInDocumentacion
 } = obraController;
 
-
-
 import { verificarAutenticacion } from './middleware.js'; 
 import ventanillaController from './ventanillaController.js'; 
 
@@ -36,29 +34,26 @@ const {
     obtenerObrasAvance, 
     obtenerInformacionObra, 
     obtenerFuentesFinanciamiento, 
-    obtenerObrasAvancePorFuente,
-    mostrarEditarAvance, // Asegúrate de que esté aquí
+    mostrarEditarAvance,
     guardarAvance 
 } = avanceController;
 
-
 const { 
-  // mostrarVentanillaUnica,  <-- Elimina esta línea
   registrarObra, 
   gestionarDocumentacion,
   actualizarObservaciones,
 } = ventanillaController;
 
+import graficasController from './graficasController.js';
+const { mostrarGraficas, obtenerDatosGrafica, obtenerObrasAvancePorFuente } = graficasController;
 
-
-const router = express.Router();
+const router = express.Router(); // Inicializar router aquí
 
 // Rutas de autenticación
 router.get("/login", mostrarLogin);
 router.post("/login", procesarLogin);
 router.get("/register", mostrarRegistro);
 router.post("/register", procesarRegistro);
-
 
 // Ruta para obras, protegida por el middleware
 router.get("/obras", verificarAutenticacion, (req, res) => {
@@ -141,21 +136,19 @@ router.get('/check-in-obra/:id', verificarAutenticacion, async (req, res) => {
 // Ruta para subir fotos
 router.post('/subir-fotos/:id', verificarAutenticacion, subirFotos, handleSubirFotos);
 
-
-
 //Rutas para ventanilla Unica
 router.get("/ventanilla-unica", verificarAutenticacion, ventanillaController.mostrarVentanillaUnica); 
-router.post("/registrar-obra", verificarAutenticacion, ventanillaController.registrarObra);  // <-- Corregido
-router.get("/gestionar-documentacion/:id", verificarAutenticacion, ventanillaController.gestionarDocumentacion);  // <-- Corregido
-router.post("/actualizar-observaciones/:id", verificarAutenticacion, ventanillaController.actualizarObservaciones);  // <-- Corregido
+router.post("/registrar-obra", verificarAutenticacion, ventanillaController.registrarObra);
+router.get("/gestionar-documentacion/:id", verificarAutenticacion, ventanillaController.gestionarDocumentacion);
+router.post("/actualizar-observaciones/:id", verificarAutenticacion, ventanillaController.actualizarObservaciones);
 router.get("/listar-obras-ventanilla", verificarAutenticacion, ventanillaController.listarObrasVentanilla);
 
 // Ruta para la vista de avances (para rol "AVANCE")
 router.get('/avance', verificarAutenticacion, async (req, res) => {
   try {
     const obras = await obtenerObrasAvance();
-    const fuentesFinanciamiento = await obtenerFuentesFinanciamiento(); // Obtener fuentes de financiamiento
-    res.render("pages/avance", { obras, fuentesFinanciamiento, req: req }); // Pasar fuentes a la vista
+    const fuentesFinanciamiento = await obtenerFuentesFinanciamiento();
+    res.render("pages/avance", { obras, fuentesFinanciamiento, req: req });
   } catch (error) {
     res.status(error.status || 500).json({ error: error.message });
   }
@@ -191,5 +184,20 @@ router.post('/guardar-avance/:nombre', verificarAutenticacion, guardarAvance);
 
 // Ruta para cerrar sesión
 router.get("/logout", cerrarSesion);
+
+// Ruta para la vista de gráficas
+router.get('/graficas', verificarAutenticacion, mostrarGraficas);
+
+// Ruta para obtener los datos de la gráfica (con filtro opcional)
+router.get('/obtener-datos-grafica/:fuente?/:obra?', verificarAutenticacion, async (req, res) => {
+  try {
+    const fuente = req.params.fuente || null;
+    const obra = req.params.obra || null;
+    const datosGrafica = await obtenerDatosGrafica(fuente, obra);
+    res.json(datosGrafica);
+  } catch (error) {
+    res.status(error.status || 500).json({ error: error.message });
+  }
+});
 
 export default router;

@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <%- include('../includes/head') %>
+  <title>Gráficas de Avances</title>
+</head>
+<body>
+  <%- include('../includes/header', { req: req }) %>
+
+  <div class="container" style="margin-top: 80px !important">
+    <h1 class="text-center">Gráficas de Avances</h1>
+
+    <div class="mb-3">
+      <label for="fuente" class="form-label">Selecciona una fuente de financiamiento:</label>
+      <select id="fuente" class="form-select" onchange="cargarObras()"> 
+        <option value="">Seleccionar Fuente de financiamiento</option> 
+        <% fuentesFinanciamiento.forEach(function(fuente) { %>
+          <option value="<%= fuente %>"><%= fuente %></option>
+        <% }); %>
+      </select>
+    </div>
+
+    <div class="mb-3">
+      <label for="obra" class="form-label">Selecciona una obra:</label>
+      <select id="obra" class="form-select" onchange="cargarGraficasObra()">
+        <option value="">Seleccionar obra</option>
+      </select>
+    </div>
+
+    <div class="btn-group mb-3" role="group">
+      <button type="button" class="btn btn-primary" onclick="cargarGraficasFuente('')">Todas</button>
+      <button type="button" class="btn btn-secondary" onclick="cargarGraficasFuente('PROAGUA')">PROAGUA</button>
+      <button type="button" class="btn btn-success" onclick="cargarGraficasFuente('ESTATALES')">ESTATALES</button>
+      <button type="button" class="btn btn-warning" onclick="cargarGraficasFuente('EXTRAORDINARIAS')">EXTRAORDINARIAS</button>
+    </div>
+
+    <div id="graficas" style="display: none;">
+      <canvas id="grafica"></canvas> 
+    </div>
+  </div>
+
+  <%- include('../includes/scripts') %>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> 
+  <script>
+    function cargarObras() {
+      const fuente = document.getElementById('fuente').value;
+      const obraSelect = document.getElementById('obra');
+      obraSelect.innerHTML = '<option value="">Seleccionar obra</option>';
+
+      if (fuente) {
+        fetch(`/obtener-obras-avance-por-fuente/${encodeURIComponent(fuente)}`)
+          .then(response => response.json())
+          .then(obras => {
+            obras.forEach(obra => {
+              const option = document.createElement('option');
+              option.value = obra.nombre_obra;
+              option.text = obra.nombre_obra;
+              obraSelect.add(option);
+            });
+          })
+          .catch(error => console.error('Error al cargar obras:', error));
+      } else { 
+        fetch(`/obtener-obras-avance`) 
+          .then(response => response.json())
+          .then(obras => {
+            obras.forEach(obra => {
+              const option = document.createElement('option');
+              option.value = obra.nombre_obra;
+              option.text = obra.nombre_obra;
+              obraSelect.add(option);
+            });
+          })
+          .catch(error => console.error('Error al cargar obras:', error));
+      }
+    }
+
+    function cargarGraficasFuente(fuente) {
+      // Construir la URL de la petición AJAX
+      let url = '/obtener-datos-grafica';
+      if (fuente) {
+        url += `/${fuente}`;
+      }
+
+      fetch(url)
+        .then(response => response.json())
+        .then(obras => {
+          if (obras) {
+            generarGrafica(obras);
+            document.getElementById('graficas').style.display = 'block';
+          } else {
+            alert('No se encontraron obras');
+          }
+        })
+        .catch(error => console.error('Error al cargar datos:', error));
+    }
+
+    function cargarGraficasObra() {
+      const fuente = document.getElementById('fuente').value;
+      const obra = document.getElementById('obra').value;
+
+      // Construir la URL de la petición AJAX
+      let url = '/obtener-datos-grafica';
+      if (fuente && obra) {
+        url += `/${fuente}/${obra}`;
+      } 
+
+      fetch(url)
+        .then(response => response.json())
+        .then(obras => {
+          if (obras) {
+            generarGrafica(obras);
+            document.getElementById('graficas').style.display = 'block';
+          } else {
+            alert('No se encontraron obras');
+          }
+        })
+        .catch(error => console.error('Error al cargar datos:', error));
+    }
+
+    function generarGrafica(obras) {
+  // Destruir la gráfica anterior si existe
+  if (window.myChart) {
+    window.myChart.destroy();
+  }
+
+  const ctx = document.getElementById('grafica').getContext('2d');
+
+  // Obtener los nombres de las obras para las etiquetas
+  const labels = obras.map(obra => obra.nombre_obra);
+
+  // Obtener los porcentajes financieros
+  const porcentajeFinanciero = obras.map(obra => obra.porcentaje_financiero);
+
+  // Obtener los porcentajes físicos
+  const porcentajeFisico = obras.map(obra => obra.porcentaje_fisico);
+
+  // Crear la gráfica
+  window.myChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          label: 'Porcentaje Financiero',
+          data: porcentajeFinanciero,
+          backgroundColor: 'rgba(54, 162, 235, 0.2)',
+          borderColor: 'rgba(54, 162, 235, 1)',
+          borderWidth: 1
+        },
+        {
+          label: 'Porcentaje Físico',
+          data: porcentajeFisico,
+          backgroundColor: 'rgba(255, 99, 132, 0.2)',
+          borderColor: 'rgba(255, 99, 132, 1)',
+          borderWidth: 1
+        }
+      ]
+    },
+    options: {
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      }
+    }
+  });
+}
+
+  </script>
+</body>
+</html>

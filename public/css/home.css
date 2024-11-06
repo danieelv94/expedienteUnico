@@ -78,6 +78,58 @@ tr {
     align-items: center;
     justify-content: center;
   }
+  tbody, td, tfoot, th, tr {
+    border-color: initial;
+    border-style: solid;
+    border-width: 0;
+}
+
+
+table tr:first-child {
+  color: #fff;
+  background-color: #f00;
+}
+.content .form-label {
+  font-weight: bold;
+}
+
+
+/* Estilos para la tabla */
+.table {
+  background-color: white;
+  border-collapse: collapse;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15); /* Sombra suave */
+  border-radius: 10px; /* Bordes redondeados */
+  overflow: hidden; /* Ocultar el desbordamiento para que las sombras se vean bien */
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.table th, .table td {
+  border: 1px solid #dee2e6;
+  padding: 0.75rem;
+}
+
+.table th {
+  background-color: #f8f9fa;
+  font-weight: bold; /* Encabezado en negrita */
+}
+
+#informacionObra .card-header {
+  background-color: #007bff; /* Color de fondo del encabezado */
+  color: white;
+  font-weight: bold;
+}
+
+#informacionObra .list-group-item {
+  font-size: 1rem; 
+}
+
+#informacionObra h2 {
+  margin-bottom: 0; 
+}
 
 
 

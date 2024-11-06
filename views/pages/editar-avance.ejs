@@ -46,7 +46,35 @@
             <label for="porcentajeFinanciero" class="form-label">Porcentaje financiero:</label>
             <input type="number" step="0.01" class="form-control" id="porcentajeFinanciero" name="porcentajeFinanciero" min="0" max="100">
           </div>
-
+          <div class="mb-3">
+            <label for="montoContrato" class="form-label">Monto del Contrato:</label>
+            <input type="number" step="0.01" class="form-control" id="montoContrato" name="montoContrato">
+          </div>
+          <div class="mb-3">
+            <label for="montoAnticipo" class="form-label">Monto del Anticipo:</label>
+            <input type="number" step="0.01" class="form-control" id="montoAnticipo" name="montoAnticipo">
+          </div>
+          <div class="mb-3">
+            <label for="montoEst1" class="form-label">Monto Estimación 1:</label>
+            <input type="number" step="0.01" class="form-control" id="montoEst1" name="montoEst1">
+          </div>
+          <div class="mb-3">
+            <label for="montoEst2" class="form-label">Monto Estimación 2:</label>
+            <input type="number" step="0.01" class="form-control" id="montoEst2" name="montoEst2">
+          </div>
+          <div class="mb-3">
+            <label for="montoEst3" class="form-label">Monto Estimación 3:</label>
+            <input type="number" step="0.01" class="form-control" id="montoEst3" name="montoEst3">
+          </div>
+          <div class="mb-3">
+            <label for="montoEst4" class="form-label">Monto Estimación 4:</label>
+            <input type="number" step="0.01" class="form-control" id="montoEst4" name="montoEst4">
+          </div>
+          <div class="mb-3">
+            <label for="montoFiniquito" class="form-label">Monto Finiquito:</label>
+            <input type="number" step="0.01" class="form-control" id="montoFiniquito" name="montoFiniquito">
+          </div>
+          <div class="table-responsive"> 
           <table class="table">
             <thead>
               <tr>
@@ -104,6 +132,7 @@
               <% } %>
             </tbody>
           </table>
+          </div>
           <div class="mb-3">
             <label for="observaciones" class="form-label">Observaciones:</label>
             <textarea class="form-control" id="observaciones" name="observaciones"></textarea>   
@@ -150,6 +179,13 @@
 
                 // Llenar los campos del formulario con la información de la obra
                 document.getElementById('contratista').value = data.contratista;
+                document.getElementById('montoContrato').value = data.monto_contrato;
+                document.getElementById('montoAnticipo').value = data.monto_anticipo;
+                document.getElementById('montoEst1').value = data.monto_est1;
+                document.getElementById('montoEst2').value = data.monto_est2;
+                document.getElementById('montoEst3').value = data.monto_est3;
+                document.getElementById('montoEst4').value = data.monto_est4;
+                document.getElementById('montoFiniquito').value = data.monto_finiquito;
                 document.getElementById('porcentajeAvance').value = data.porcentaje_avance;
                 document.getElementById('porcentajeFisico').value = data.porcentaje_fisico || 0; // Si no existe, asignar 0
                 document.getElementById('porcentajeFinanciero').value = data.porcentaje_financiero || 0; // Si no existe, asignar 0
