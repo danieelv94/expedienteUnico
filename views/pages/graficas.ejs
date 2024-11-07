@@ -10,6 +10,13 @@
   <div class="container" style="margin-top: 80px !important">
     <h1 class="text-center">Gráficas de Avances</h1>
 
+    <div class="btn-group mb-3" role="group">
+      <button type="button" class="btn btn-primary" onclick="cargarGraficasFuente('')">Todas</button>
+      <button type="button" class="btn btn-secondary" onclick="cargarGraficasFuente('PROAGUA')">PROAGUA</button>
+      <button type="button" class="btn btn-success" onclick="cargarGraficasFuente('ESTATALES')">ESTATALES</button>
+      <button type="button" class="btn btn-warning" onclick="cargarGraficasFuente('EXTRAORDINARIAS')">EXTRAORDINARIAS</button>
+    </div>
+    
     <div class="mb-3">
       <label for="fuente" class="form-label">Selecciona una fuente de financiamiento:</label>
       <select id="fuente" class="form-select" onchange="cargarObras()"> 
@@ -25,13 +32,6 @@
       <select id="obra" class="form-select" onchange="cargarGraficasObra()">
         <option value="">Seleccionar obra</option>
       </select>
-    </div>
-
-    <div class="btn-group mb-3" role="group">
-      <button type="button" class="btn btn-primary" onclick="cargarGraficasFuente('')">Todas</button>
-      <button type="button" class="btn btn-secondary" onclick="cargarGraficasFuente('PROAGUA')">PROAGUA</button>
-      <button type="button" class="btn btn-success" onclick="cargarGraficasFuente('ESTATALES')">ESTATALES</button>
-      <button type="button" class="btn btn-warning" onclick="cargarGraficasFuente('EXTRAORDINARIAS')">EXTRAORDINARIAS</button>
     </div>
 
     <div id="graficas" style="display: none;">

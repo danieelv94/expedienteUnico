@@ -49,8 +49,9 @@ a {
 
 .header .menu {
   clear: both;
-  max-height: 0;
+  max-height: 0; /* Inicialmente colapsado */
   transition: max-height 0.2s ease-out;
+  overflow-y: auto; /* Hacer el menú desplazable */
 }
 
 /* menu icon */
@@ -99,7 +100,7 @@ a {
 }
 
 .header .menu-btn:checked ~ .menu {
-  max-height: 240px;
+  max-height: 100vh; /* Expandir el menú al máximo */
 }
 
 .header .menu-btn:checked ~ .menu-icon .navicon {
@@ -131,7 +132,8 @@ a {
   .header .menu {
     clear: none;
     float: right;
-    max-height: none;
+    max-height: none; /* No hay límite de altura en pantallas grandes */
+    overflow-y: visible; /* Mostrar todas las opciones sin desplazamiento */
   }
   .header .menu-icon {
     display: none;
@@ -141,4 +143,3 @@ a {
 .active {
   border-bottom: 3px solid #3f8a3b !important;
 }
-
