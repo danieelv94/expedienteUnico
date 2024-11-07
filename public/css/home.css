@@ -131,8 +131,15 @@ table tr:first-child {
   margin-bottom: 0; 
 }
 
+/* Estilos para los botones en pantallas pequeñas */
+@media (max-width: 576px) { /* Ajusta el valor según tu diseño */
+  .btn-group {
+    display: flex;
+    flex-direction: column; /* Apilar los botones verticalmente */
+    gap: 0.5rem; /* Espacio entre los botones */
+  }
 
-
-
-
-
+  .btn-group .btn {
+    width: 100%; /* Los botones ocupan todo el ancho */
+  }
+}
