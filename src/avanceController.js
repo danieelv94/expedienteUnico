@@ -99,7 +99,8 @@ export const obtenerFuentesFinanciamiento = async () => {
           oa.monto_est4,
           oa.monto_finiquito,
           oa.observaciones,
-          oa.contratista
+          oa.contratista,
+          oa.residentes
         FROM obras_avance oa
         WHERE oa.nombre_obra = ?`,
         [nombreObra]
@@ -113,6 +114,7 @@ export const obtenerFuentesFinanciamiento = async () => {
       return {
         ...obra,
         contratista: obra.contratista,
+        residentes: obra.residentes,
         porcentajeAvance: obra.porcentaje_avance,
         porcentajeFisico: obra.porcentaje_fisico,
         porcentajeFinanciero: obra.porcentaje_financiero,
@@ -174,8 +176,8 @@ export const obtenerFuentesFinanciamiento = async () => {
         values.push(data[`check${i}_2`] === 'on' ? 1 : 0);
       }
       // Agregar la columna 'observaciones' y su valor
-      sql += "monto_contrato = ?,monto_anticipo = ?,monto_est1 = ?,monto_est2 = ?,monto_est3 = ?,monto_est4 = ?,monto_finiquito = ?,contratista = ?,porcentaje_avance = ?, porcentaje_fisico = ?, porcentaje_financiero = ?, observaciones = ? WHERE nombre_obra = ?";
-      values.push(data.montoContrato,data.montoAnticipo,data.montoEst1,data.montoEst2,data.montoEst3,data.montoEst4,data.montoFiniquito,data.contratista,data.porcentajeAvance, data.porcentajeFisico, data.porcentajeFinanciero, data.observaciones, nombreObra);
+      sql += "monto_contrato = ?,monto_anticipo = ?,monto_est1 = ?,monto_est2 = ?,monto_est3 = ?,monto_est4 = ?,monto_finiquito = ?,contratista = ?,residentes = ?,porcentaje_avance = ?, porcentaje_fisico = ?, porcentaje_financiero = ?, observaciones = ? WHERE nombre_obra = ?";
+      values.push(data.montoContrato,data.montoAnticipo,data.montoEst1,data.montoEst2,data.montoEst3,data.montoEst4,data.montoFiniquito,data.contratista,data.residentes,data.porcentajeAvance, data.porcentajeFisico, data.porcentajeFinanciero, data.observaciones, nombreObra);
 
       // Ejecutar la consulta SQL
       await pool.query(sql, values);

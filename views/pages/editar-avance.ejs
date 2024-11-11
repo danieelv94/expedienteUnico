@@ -35,6 +35,10 @@
             <input type="text" class="form-control" id="contratista" name="contratista">
           </div>
           <div class="mb-3">
+            <label for="residentes" class="form-label">Residente:</label>
+            <input type="text" class="form-control" id="residentes" name="residentes">
+          </div>
+          <div class="mb-3">
             <label for="porcentajeAvance" class="form-label">Porcentaje de avance:</label>
             <input type="number" step="0.01" class="form-control" id="porcentajeAvance" name="porcentajeAvance" min="0" max="100">
           </div>
@@ -179,6 +183,7 @@
 
                 // Llenar los campos del formulario con la información de la obra
                 document.getElementById('contratista').value = data.contratista;
+                document.getElementById('residentes').value = data.residentes;
                 document.getElementById('montoContrato').value = data.monto_contrato;
                 document.getElementById('montoAnticipo').value = data.monto_anticipo;
                 document.getElementById('montoEst1').value = data.monto_est1;

@@ -41,7 +41,7 @@
               Contratista: <span id="contratista"></span>
             </li>
             <li class="list-group-item">
-              Porcentaje de avance: <span id="porcentajeAvance"></span>%
+              Residente: <span id="residentes"></span>
             </li>
             <li class="list-group-item">
               Porcentaje físico: <span id="porcentajeFisico"></span>%
@@ -94,7 +94,7 @@
         if (data) {
           document.getElementById('nombreObra').textContent = nombreObra;
           document.getElementById('contratista').textContent = data.contratista || 'N/A';
-          document.getElementById('porcentajeAvance').textContent = data.porcentaje_avance || '0';
+          document.getElementById('residentes').textContent = data.residentes || 'N/A';
           document.getElementById('porcentajeFisico').textContent = data.porcentaje_fisico || '0';
           document.getElementById('porcentajeFinanciero').textContent = data.porcentaje_financiero || '0';
           document.getElementById('observaciones').textContent = data.observaciones || 'Sin observaciones';
