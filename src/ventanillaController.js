@@ -6,7 +6,7 @@ import obraController from './obraController.js';
 const { obtenerDetallesObra } = obraController;
 
 export const mostrarVentanillaUnica = async (req, res) => {
-    if (req.session.user.rol !== 'Ventanilla') {
+    if (!req.session.roles || !req.session.roles.includes('Ventanilla')) {
         return res.status(403).send('No tienes permiso para acceder a esta página');
     }
     try {
@@ -18,7 +18,7 @@ export const mostrarVentanillaUnica = async (req, res) => {
 };
 
 export const registrarObra = async (req, res) => {
-    if (req.session.user.rol !== 'Ventanilla') {
+    if (!req.session.roles || !req.session.roles.includes('Ventanilla')) {
         return res.status(403).send('No tienes permiso para acceder a esta página');
     }
     try {
@@ -53,7 +53,7 @@ export const registrarObra = async (req, res) => {
 };
 
 export const gestionarDocumentacion = async (req, res) => {
-    if (req.session.user.rol !== 'Ventanilla') {
+    if (!req.session.roles || !req.session.roles.includes('Ventanilla')) {
         return res.status(403).send('No tienes permiso para acceder a esta página');
     }
     try {
@@ -76,7 +76,7 @@ export const gestionarDocumentacion = async (req, res) => {
 };
 
 export const actualizarObservaciones = async (req, res) => {
-    if (req.session.user.rol !== 'Ventanilla') {
+    if (!req.session.roles || !req.session.roles.includes('Ventanilla')) {
         return res.status(403).send('No tienes permiso para acceder a esta página');
     }
     try {
@@ -107,7 +107,7 @@ export const obtenerDocumentos = async () => {
 };
 
 export const listarObrasVentanilla = async (req, res) => {
-    if (req.session.user.rol !== 'Ventanilla') {
+    if (!req.session.roles || !req.session.roles.includes('Ventanilla')) {
         return res.status(403).send('No tienes permiso para acceder a esta página');
     }
     try {

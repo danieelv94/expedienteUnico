@@ -17,7 +17,6 @@ export const mostrarAvances = async (req, res) => {
       monto_est3: 0, 
       monto_est4: 0,
       monto_finiquito: 0,
-      // ... otras propiedades con valores por defecto ...
     }; 
 
     if (obras.length > 0) {
@@ -150,7 +149,8 @@ export const obtenerFuentesFinanciamiento = async () => {
   };
 
   export const mostrarEditarAvance = async (req, res) => {
-    if (req.session.user.rol !== 'Admin AVANCE') {
+    // Verificar si el usuario tiene el rol 'AVANCE' en su lista de roles
+    if (!req.session.roles || !req.session.roles.includes('Admin AVANCE')) { 
       return res.status(403).send('No tienes permiso para acceder a esta página');
     }
     try {

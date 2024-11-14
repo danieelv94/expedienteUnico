@@ -1,7 +1,8 @@
 import pool from "./db.js";
 
 export const mostrarGraficas = async (req, res) => {
-  if (req.session.user.rol !== 'AVANCE') { // Ajusta el rol si es necesario
+  // Verificar si el usuario tiene el rol 'AVANCE' en su lista de roles
+  if (!req.session.roles || !req.session.roles.includes('AVANCE')) { 
     return res.status(403).send('No tienes permiso para acceder a esta página');
   }
   try {

@@ -1,4 +1,5 @@
 import express from "express";
+const router = express.Router(); // Inicializar router aquí
 import { 
     mostrarLogin, 
     procesarLogin, 
@@ -47,7 +48,31 @@ const {
 import graficasController from './graficasController.js';
 const { mostrarGraficas, obtenerDatosGrafica, obtenerObrasAvancePorFuente } = graficasController;
 
-const router = express.Router(); // Inicializar router aquí
+import superAdminController from './superAdminController.js';
+const { mostrarSuperAdmin, guardarRolesUsuario } = superAdminController;
+import { obtenerRolesUsuario } from './authController.js'; // Importar la función aquí
+
+router.post('/eliminar-roles-usuario/:id', verificarAutenticacion, superAdminController.eliminarRolesUsuario);
+router.get('/obtener-roles-usuario/:id', verificarAutenticacion, async (req, res) => {
+  try {
+    const usuarioId = req.params.id;
+    const rolesUsuario = await obtenerRolesUsuario(usuarioId); // Asegúrate de tener esta función en authController.js
+    res.json(rolesUsuario);
+  } catch (error) {
+    console.error("Error al obtener roles del usuario:", error);
+    res.status(500).json({ error: "Error al obtener roles del usuario" });
+  }
+});
+
+router.post('/eliminar-roles-usuario/:id', verificarAutenticacion, superAdminController.eliminarRolesUsuario);
+
+
+
+router.get('/super-admin', verificarAutenticacion, mostrarSuperAdmin);
+router.post('/guardar-roles-usuario/:id', verificarAutenticacion, guardarRolesUsuario);
+
+
+
 
 // Rutas de autenticación
 router.get("/login", mostrarLogin);
@@ -73,7 +98,8 @@ router.get("/detalles/:id", verificarAutenticacion, async (req, res) => {
 
 // Ruta para la vista de "Mis Obras"
 router.get('/mis-obras', verificarAutenticacion, async (req, res) => {
-  if (req.session.user.rol !== 'DIVA') {
+  // Verificar si el usuario tiene el rol 'DIVA'
+  if (!req.session.roles || !req.session.roles.includes('DIVA')) { 
       return res.status(403).send('No tienes permiso para acceder a esta página');
   }
 
@@ -199,5 +225,7 @@ router.get('/obtener-datos-grafica/:fuente?/:obra?', verificarAutenticacion, asy
     res.status(error.status || 500).json({ error: error.message });
   }
 });
+
+
 
 export default router;

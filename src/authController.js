@@ -34,19 +34,26 @@ export async function procesarLogin(req, res) {
 
             if (match) {
                 req.session.user = usuario; 
-                // Redirigir según el rol del usuario
-                if (usuario.rol === 'DIVA') {
-                    res.redirect("/mis-obras"); 
-                } else if (usuario.rol === 'DIVA administrador') {
+                
+                // Obtener los roles del usuario
+                const rolesUsuario = await obtenerRolesUsuario(usuario.id_usuario);
+                req.session.roles = rolesUsuario; 
+
+                // Redirigir según el rol del usuario (puedes ajustar la lógica según tus necesidades)
+                if (req.session.roles.includes('DIVA administrador')) {
                     res.redirect("/obras"); 
-                } else if (usuario.rol === 'Ventanilla') {
+                } else if (req.session.roles.includes('DIVA')) {
+                    res.redirect("/mis-obras"); 
+                } else if (req.session.roles.includes('Ventanilla')) {
                     res.redirect("/ventanilla-unica"); 
-                } else if (usuario.rol === 'AVANCE') { // <-- Agregar esta condición
-                    res.redirect("/avance"); // <-- Redirigir a la vista de avances
-                } else if (usuario.rol === 'Admin AVANCE') { // <-- Agregar esta condición
-                    res.redirect("/editar-avance"); // <-- Redirigir a la vista de avances
+                } else if (req.session.roles.includes('AVANCE')) {
+                    res.redirect("/avance"); 
+                } else if (req.session.roles.includes('Admin AVANCE')) {
+                    res.redirect("/editar-avance"); 
+                } 
+                else if (req.session.roles.includes('Super Admin')) {
+                    res.redirect("/super-admin"); 
                 } else {
-                    // Manejar el caso de un rol no válido
                     res.render("pages/login", { error: "Rol de usuario no válido" });
                 }
 
@@ -61,6 +68,21 @@ export async function procesarLogin(req, res) {
         res.status(500).json({ error: "Error en el servidor" });
     }
 }
+
+export async function obtenerRolesUsuario(usuarioId) {
+    try {
+      const [rows] = await pool.query(`
+        SELECT r.nombre_rol
+        FROM roles r
+        JOIN usuarios_roles ur ON r.id_rol = ur.id_rol
+        WHERE ur.id_usuario = ?
+      `, [usuarioId]);
+      return rows.map(row => row.nombre_rol);
+    } catch (error) {
+      console.error("Error al obtener roles del usuario:", error);
+      throw error; 
+    }
+  }
 
 // Función para mostrar la página de registro
 export function mostrarRegistro(req, res) {
