@@ -5,22 +5,6 @@
   <input class="menu-btn" type="checkbox" id="menu-btn" />
   <label class="menu-icon" for="menu-btn"><span class="navicon"></span></label>  
   <ul class="menu">  
-    <li>
-      <% if (req.session.user) { %>
-        <a class="menu-item" href="
-          <%= req.session.roles.includes('DIVA administrador') ? '/obras' : 
-             req.session.roles.includes('DIVA') ? '/mis-obras' : 
-             req.session.roles.includes('Ventanilla') ? '/ventanilla-unica' : 
-             req.session.roles.includes('AVANCE') ? '/avance' : 
-             req.session.roles.includes('Super Admin') ? '/super-admin' :
-             req.session.roles.includes('Admin AVANCE') ? '/editar-avance' : 
-             '/' %>
-        "> Inicio </a> 
-      <% } else { %>
-        <a class="menu-item" href="/"> Inicio </a>
-      <% } %>
-    </li>
-
     <% if (req.session.user && req.session.roles.includes('DIVA administrador')) { %>
       <li>
         <a class="menu-item" href="/obras"> Obras </a> 
@@ -55,12 +39,16 @@
         <a class="menu-item" href="/editar-avance"> Editar Avance </a> 
       </li>
     <% } %>
+    <% if (req.session.user && req.session.roles.includes('Residente')) { %>  
+      <li>
+        <a class="menu-item" href="/residentes"> Residentes </a> 
+      </li>
+    <% } %>
     <% if (req.session.user && req.session.roles.includes('Super Admin')) { %>  
       <li>
         <a class="menu-item" href="/super-admin"> Super Admin </a> 
       </li>
     <% } %>
-
     <li>
       <a class="menu-item" href="/logout"> Cerrar Sesión </a>
     </li>

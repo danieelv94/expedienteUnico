@@ -156,7 +156,8 @@ export const obtenerFuentesFinanciamiento = async () => {
     try {
       const obras = await obtenerObrasAvance();
       const fuentesFinanciamiento = await obtenerFuentesFinanciamiento();
-      res.render("pages/editar-avance", { obras, fuentesFinanciamiento, req: req });
+      const residentes = await obtenerResidentes(); // Obtener residentes
+      res.render("pages/editar-avance", { obras, fuentesFinanciamiento, residentes, req: req }); // Pasar residentes a la vista
     } catch (error) {
       res.status(error.status || 500).json({ error: error.message });
     }
@@ -166,6 +167,7 @@ export const obtenerFuentesFinanciamiento = async () => {
     try {
       const nombreObra = req.params.nombre;
       const data = req.body;
+      const residenteId = req.body.residentes;
 
       // Construir la consulta SQL para actualizar la obra
       let sql = "UPDATE obras_avance SET ";
@@ -181,6 +183,12 @@ export const obtenerFuentesFinanciamiento = async () => {
 
       // Ejecutar la consulta SQL
       await pool.query(sql, values);
+      
+      const obraId = await obtenerIdObraPorNombre(nombreObra); // Debes implementar esta función
+      await pool.query(
+        "INSERT INTO obras_residentes (obra_id, residente_id) VALUES (?, ?)",
+        [obraId, residenteId]
+      );
 
       res.status(200).send('Cambios guardados correctamente');
     } catch (error) {
@@ -188,6 +196,37 @@ export const obtenerFuentesFinanciamiento = async () => {
       res.status(500).send('Error al guardar los cambios');
     }
   };
+
+  export const obtenerResidentes = async () => {
+    try {
+      const [rows] = await pool.query(
+        `SELECT id_usuario, nombre_usuario 
+        FROM usuarios 
+        WHERE rol = 'Residente'`
+      );
+      return rows;
+    } catch (error) {
+      console.error("Error al obtener residentes:", error);
+      throw { status: 500, message: "Error al obtener residentes" };
+    }
+  };
+// En avanceController.js
+export const obtenerIdObraPorNombre = async (nombreObra) => {
+  try {
+    const [rows] = await pool.query(
+      "SELECT id FROM obras_avance WHERE nombre_obra = ?",
+      [nombreObra]
+    );
+    if (rows.length === 0) {
+      throw { status: 404, message: "Obra no encontrada" };
+    }
+    return rows[0].id;
+  } catch (error) {
+    console.error("Error al obtener ID de la obra:", error);
+    throw { status: 500, message: "Error al obtener ID de la obra" };
+  }
+};
+  
 
   export default {
     mostrarAvances,

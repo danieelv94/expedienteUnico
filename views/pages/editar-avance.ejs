@@ -36,7 +36,12 @@
           </div>
           <div class="mb-3">
             <label for="residentes" class="form-label">Residente:</label>
-            <input type="text" class="form-control" id="residentes" name="residentes">
+            <select id="residentes" name="residentes" class="form-select">
+              <option value="">Seleccionar residente</option>
+              <% residentes.forEach(function(residente) { %>
+                <option value="<%= residente.id_usuario %>"><%= residente.nombre_usuario %></option>
+              <% }); %>
+            </select>
           </div>
           <div class="mb-3">
             <label for="porcentajeAvance" class="form-label">Porcentaje de avance:</label>
@@ -174,6 +179,7 @@
 
         if (nombreObra) {
           // Realizar la petición AJAX
+          
           fetch(`/obtener-informacion-obra/${encodeURIComponent(nombreObra)}`) // Corrección aquí
             .then(response => response.json())
             .then(data => {

@@ -65,8 +65,19 @@ router.get('/obtener-roles-usuario/:id', verificarAutenticacion, async (req, res
 });
 
 router.post('/eliminar-roles-usuario/:id', verificarAutenticacion, superAdminController.eliminarRolesUsuario);
+import residentesController from './residentesController.js'; // 
 
-
+router.get('/obtener-residentes', verificarAutenticacion, async (req, res) => {
+  try {
+    const residentes = await avanceController.obtenerResidentes();
+    res.json(residentes);
+  } catch (error) {
+    res.status(error.status || 500).json({ error: error.message });
+  }
+});
+router.get('/residentes', verificarAutenticacion, residentesController.mostrarObrasAsignadas);
+router.get('/modificar-avance-fisico/:id', verificarAutenticacion, residentesController.modificarAvanceFisico);
+router.post('/guardar-avance-fisico/:id', verificarAutenticacion, residentesController.guardarAvanceFisico);
 
 router.get('/super-admin', verificarAutenticacion, mostrarSuperAdmin);
 router.post('/guardar-roles-usuario/:id', verificarAutenticacion, guardarRolesUsuario);

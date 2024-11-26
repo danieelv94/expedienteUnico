@@ -50,9 +50,10 @@ export async function procesarLogin(req, res) {
                     res.redirect("/avance"); 
                 } else if (req.session.roles.includes('Admin AVANCE')) {
                     res.redirect("/editar-avance"); 
-                } 
-                else if (req.session.roles.includes('Super Admin')) {
+                } else if (req.session.roles.includes('Super Admin')) {
                     res.redirect("/super-admin"); 
+                } else if (req.session.roles.includes('Residente')) {
+                    res.redirect("/residentes"); 
                 } else {
                     res.render("pages/login", { error: "Rol de usuario no válido" });
                 }
