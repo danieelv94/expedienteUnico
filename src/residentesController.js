@@ -27,19 +27,21 @@ export const modificarAvanceFisico = async (req, res) => {
 };
 
 export const guardarAvanceFisico = async (req, res) => {
-    try {
-      const obraId = req.params.id;
-      const nuevoAvance = req.body.avanceFisico;
-      await pool.query(
-        "UPDATE obras_avance SET porcentaje_fisico = ? WHERE id = ?",
-        [nuevoAvance, obraId]
-      );
-      res.redirect("/residentes"); // Redirigir de nuevo a la vista de residentes
-    } catch (error) {
-      console.error("Error al guardar avance físico:", error);
-      res.status(500).json({ error: "Error al guardar avance físico" });
-    }
-  };
+  try {
+    const obraId = req.params.id;
+    const nuevoAvance = req.body.avanceFisico;
+    await pool.query(
+      "UPDATE obras_avance SET porcentaje_fisico = ? WHERE id = ?",
+      [nuevoAvance, obraId]
+    );
+
+    // Enviar una respuesta exitosa al cliente para que muestre la alerta
+    res.status(200).json({ message: 'Avance físico actualizado correctamente' }); 
+  } catch (error) {
+    console.error("Error al guardar avance físico:", error);
+    res.status(500).json({ error: "Error al guardar avance físico" });
+  }
+};
 
 export default {
   mostrarObrasAsignadas,

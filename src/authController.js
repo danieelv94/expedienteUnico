@@ -54,7 +54,9 @@ export async function procesarLogin(req, res) {
                     res.redirect("/super-admin"); 
                 } else if (req.session.roles.includes('Residente')) {
                     res.redirect("/residentes"); 
-                } else {
+                } else if (req.session.roles.includes('Infraestructura')) {
+                    res.redirect("/asignar-residentes"); 
+                }else {
                     res.render("pages/login", { error: "Rol de usuario no válido" });
                 }
 

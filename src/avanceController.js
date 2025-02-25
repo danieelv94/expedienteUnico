@@ -16,6 +16,8 @@ export const mostrarAvances = async (req, res) => {
       monto_est2: 0, 
       monto_est3: 0, 
       monto_est4: 0,
+      monto_est5: 0,
+      monto_est6: 0,
       monto_finiquito: 0,
     }; 
 
@@ -27,7 +29,7 @@ export const mostrarAvances = async (req, res) => {
     res.render("pages/avance", { 
       obras, 
       fuentesFinanciamiento, 
-      obra: obra, 
+      obra: obra,
       req: req 
     });
 
@@ -69,9 +71,10 @@ export const obtenerFuentesFinanciamiento = async () => {
 
   export const obtenerInformacionObra = async (nombreObra) => {
     try {
-      // Consulta para obtener la información de la obra, incluyendo el porcentaje de avance
+      // Consulta para obtener la información de la obra, incluyendo el porcentaje de avance y el residente
       const [rows] = await pool.query(
         `SELECT 
+          oa.id,
           oa.check1_1, oa.check1_2, 
           oa.check2_1, oa.check2_2, 
           oa.check3_1, oa.check3_2, 
@@ -87,6 +90,8 @@ export const obtenerFuentesFinanciamiento = async () => {
           oa.check13_1, oa.check13_2,
           oa.check14_1, oa.check14_2,
           oa.check15_1, oa.check15_2,
+          oa.check16_1, oa.check16_2,
+          oa.check17_1, oa.check17_2,
           oa.porcentaje_avance,
           oa.porcentaje_fisico,
           oa.porcentaje_financiero,
@@ -96,11 +101,17 @@ export const obtenerFuentesFinanciamiento = async () => {
           oa.monto_est2,
           oa.monto_est3,
           oa.monto_est4,
+          oa.monto_est5,
+          oa.monto_est6,
           oa.monto_finiquito,
           oa.observaciones,
+          oa.municipio,
           oa.contratista,
-          oa.residentes
+          obr.residente_id,  -- Obtener el ID del residente
+          u.nombre_usuario AS residente_nombre  -- Obtener el nombre del residente
         FROM obras_avance oa
+        LEFT JOIN obras_residentes obr ON oa.id = obr.obra_id  
+        LEFT JOIN usuarios u ON obr.residente_id = u.id_usuario 
         WHERE oa.nombre_obra = ?`,
         [nombreObra]
       );
@@ -113,7 +124,7 @@ export const obtenerFuentesFinanciamiento = async () => {
       return {
         ...obra,
         contratista: obra.contratista,
-        residentes: obra.residentes,
+        residentes: obra.residente_nombre,  // Retornar el nombre del residente
         porcentajeAvance: obra.porcentaje_avance,
         porcentajeFisico: obra.porcentaje_fisico,
         porcentajeFinanciero: obra.porcentaje_financiero,
@@ -123,19 +134,25 @@ export const obtenerFuentesFinanciamiento = async () => {
         montoEst2: obra.monto_est2,
         montoEst3: obra.monto_est3,
         montoEst4: obra.monto_est4,
-        montoFiniquito: obra.monto_finiquito
+        montoEst5: obra.monto_est5,
+        montoEst6: obra.monto_est6,
+        montoFiniquito: obra.monto_finiquito,
+        municipio: obra.municipio,
+        residenteId: obra.residente_id, // Agregar el ID del residente
       };
     } catch (error) {
       console.error("Error al obtener información de la obra:", error);
       throw { status: 500, message: "Error al obtener información de la obra" };
     }
   };
+  
 
   export const obtenerObrasAvance = async () => {
     try {
       // Consulta para obtener las obras con sus fuentes de financiamiento y municipios
       const [rows] = await pool.query(
-        `SELECT 
+        `SELECT
+          oa.id,
           oa.nombre_obra, 
           oa.fuente_financiamiento, 
           oa.municipio 
@@ -167,29 +184,65 @@ export const obtenerFuentesFinanciamiento = async () => {
     try {
       const nombreObra = req.params.nombre;
       const data = req.body;
-      const residenteId = req.body.residentes;
-
+  
       // Construir la consulta SQL para actualizar la obra
       let sql = "UPDATE obras_avance SET ";
       const values = [];
-      for (let i = 1; i <= 15; i++) {
+      for (let i = 1; i <= 17; i++) {
         sql += `check${i}_1 = ?, check${i}_2 = ?, `; 
         values.push(data[`check${i}_1`] === 'on' ? 1 : 0); 
         values.push(data[`check${i}_2`] === 'on' ? 1 : 0);
       }
-      // Agregar la columna 'observaciones' y su valor
-      sql += "monto_contrato = ?,monto_anticipo = ?,monto_est1 = ?,monto_est2 = ?,monto_est3 = ?,monto_est4 = ?,monto_finiquito = ?,contratista = ?,residentes = ?,porcentaje_avance = ?, porcentaje_fisico = ?, porcentaje_financiero = ?, observaciones = ? WHERE nombre_obra = ?";
-      values.push(data.montoContrato,data.montoAnticipo,data.montoEst1,data.montoEst2,data.montoEst3,data.montoEst4,data.montoFiniquito,data.contratista,data.residentes,data.porcentajeAvance, data.porcentajeFisico, data.porcentajeFinanciero, data.observaciones, nombreObra);
-
-      // Ejecutar la consulta SQL
+      
+      sql += "monto_contrato = ?,monto_anticipo = ?,monto_est1 = ?,monto_est2 = ?,monto_est3 = ?,monto_est4 = ?,monto_est5 = ?,monto_est6 = ?,monto_finiquito = ?,contratista = ?,porcentaje_avance = ?, porcentaje_fisico = ?, porcentaje_financiero = ?, observaciones = ? WHERE nombre_obra = ?";
+      values.push(
+        data.montoContrato, 
+        data.montoAnticipo, 
+        data.montoEst1, 
+        data.montoEst2, 
+        data.montoEst3, 
+        data.montoEst4, 
+        data.montoEst5, 
+        data.montoEst6, 
+        data.montoFiniquito, 
+        data.contratista, 
+        data.porcentajeAvance, 
+        data.porcentajeFisico, 
+        data.porcentajeFinanciero, 
+        data.observaciones, 
+        data.municipio,
+        nombreObra
+      );
+  
+      // Ejecutar la consulta SQL para actualizar la obra
       await pool.query(sql, values);
       
-      const obraId = await obtenerIdObraPorNombre(nombreObra); // Debes implementar esta función
-      await pool.query(
-        "INSERT INTO obras_residentes (obra_id, residente_id) VALUES (?, ?)",
-        [obraId, residenteId]
-      );
-
+      // Obtener el ID de la obra
+      const obraId = await obtenerIdObraPorNombre(nombreObra);
+  
+      // Verificar si se proporcionó un ID de residente
+      if (data.residentes) { 
+        // Si se proporcionó un ID de residente, verificar si ya existe una asignación
+        const [rows] = await pool.query(
+          "SELECT * FROM obras_residentes WHERE obra_id = ?",
+          [obraId]
+        );
+  
+        if (rows.length > 0) {
+          // Si ya existe, actualizar la asignación
+          await pool.query(
+            "UPDATE obras_residentes SET residente_id = ? WHERE obra_id = ?",
+            [data.residentes, obraId]
+          );
+        } else {
+          // Si no existe, insertar una nueva asignación
+          await pool.query(
+            "INSERT INTO obras_residentes (obra_id, residente_id) VALUES (?, ?)",
+            [obraId, data.residentes]
+          );
+        }
+      }
+  
       res.status(200).send('Cambios guardados correctamente');
     } catch (error) {
       console.error("Error al guardar la información de la obra:", error);
@@ -226,7 +279,63 @@ export const obtenerIdObraPorNombre = async (nombreObra) => {
     throw { status: 500, message: "Error al obtener ID de la obra" };
   }
 };
-  
+
+export const mostrarAsignarResidentes = async (req, res) => {
+  // Verificar si el usuario tiene el rol 'Infraestructura'
+  if (!req.session.roles || !req.session.roles.includes('Infraestructura')) { 
+    return res.status(403).send('No tienes permiso para acceder a esta página');
+  }
+  try {
+    const obras = await obtenerObrasAvance();
+    const residentes = await obtenerResidentes();
+    res.render("pages/asignar-residentes", { obras, residentes, req: req }); 
+  } catch (error) {
+    res.status(error.status || 500).json({ error: error.message });
+  }
+};
+
+
+
+export const asignarResidente = async (req, res) => {
+  try {
+    console.log("Datos recibidos:", req.body);
+
+    const obraId = req.body.obra;
+    const residenteId = req.body.residente;
+
+    // Validar que obraId sea un número entero
+    if (!obraId || !/^\d+$/.test(obraId)) { 
+      console.error("obraId no es válido:", obraId);
+      return res.status(400).send('Debe seleccionar una obra válida');
+    }
+
+    // Verificar si ya existe una asignación para esta obra
+    const [rows] = await pool.query(
+      "SELECT * FROM obras_residentes WHERE obra_id = ?",
+      [obraId]
+    );
+
+    if (rows.length > 0) {
+      // Ya existe una asignación para esta obra
+      return res.status(400).send('Esta obra ya tiene un residente asignado.');
+    } else {
+      // Insertar una nueva asignación
+      console.log("Insertando nueva asignación para obraId:", obraId);
+      await pool.query(
+        "INSERT INTO obras_residentes (obra_id, residente_id) VALUES (?, ?)",
+        [obraId, residenteId]
+      );
+    }
+
+    res.status(200).send('Residente asignado correctamente');
+  } catch (error) {
+    console.error("Error al asignar residente:", error);
+    res.status(500).send(`Error al asignar el residente: ${error.message}`);
+  }
+};
+
+// ... otras funciones ...
+
 
   export default {
     mostrarAvances,
@@ -235,5 +344,7 @@ export const obtenerIdObraPorNombre = async (nombreObra) => {
     obtenerFuentesFinanciamiento,
     obtenerObrasAvancePorFuente,
     mostrarEditarAvance,
-    guardarAvance
+    guardarAvance,
+    mostrarAsignarResidentes,
+  asignarResidente
   };

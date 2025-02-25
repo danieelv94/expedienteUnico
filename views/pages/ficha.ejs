@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <%- include('../includes/head') %>
+    <title>Ficha</title>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.css"> 
+  </head>
+  <body>
+    <%- include('../includes/header', { req: req }) %>
+    <div class="container" style="margin-top: 80px !important">
+      <h1 class="text-center">Ficha</h1> 
+
+      <table id="tablaMunicipios" class="table"> 
+        <thead>
+          <tr>
+            <th>Municipio</th>
+            <th>PDF</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% municipios.forEach(function(municipio) { %>
+            <tr>
+              <td><%= municipio.nombre %></td>
+              <td>
+                <% if (municipio.pdf) { %>
+                  <a href="<%= municipio.pdf %>" target="_blank" class="btn btn-primary btn-sm">Ver PDF</a> 
+
+                  <div id="contenedorEnlace<%= municipio.id %>"> 
+                    <input type="text" id="enlacePDF<%= municipio.id %>" value="http://62.72.24.252:3600/<%= municipio.pdf %>" readonly hide>
+                    <button class="btn btn-secondary btn-sm" onclick="copiarEnlace('enlacePDF<%= municipio.id %>')">Copiar Enlace</button>
+                  </div>
+                <% } else { %>
+                  Sin PDF
+                <% } %>
+              </td>
+              <td>
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalSubirPDF<%= municipio.id %>">
+                  Subir PDF
+                </button>
+                <div class="modal fade" id="modalSubirPDF<%= municipio.id %>" tabindex="-1" aria-labelledby="modalSubirPDFLabel<%= municipio.id %>" aria-hidden="true">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title" id="modalSubirPDFLabel<%= municipio.id %>">Subir PDF para <%= municipio.nombre %></h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                      <form action="/subir-pdf/<%= municipio.id %>" method="POST" enctype="multipart/form-data"> 
+                        <div class="modal-body">
+                          <div class="mb-3">
+                            <label for="pdf" class="form-label">Selecciona un PDF:</label>
+                            <input type="file" class="form-control" id="pdf" name="pdf" accept=".pdf" required>
+                          </div>
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                          <button type="submit" class="btn btn-primary">Subir PDF</button>
+                        </div>
+                      </form>                      
+                    </div>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </div>
+
+    <%- include('../includes/scripts') %>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.js"></script>
+    <script>
+      function copiarEnlace(inputId) {
+        if (navigator.clipboard) {
+          navigator.clipboard.writeText(document.getElementById(inputId).value)
+            .then(() => {
+              alert("Enlace copiado al portapapeles");
+            })
+            .catch(err => {
+              console.error("Error al copiar el enlace: ", err);
+            });
+        } else {
+          // Fallback si la API del portapapeles no está disponible
+          var enlaceInput = document.getElementById(inputId);
+          enlaceInput.select();
+          enlaceInput.setSelectionRange(0, 99999); /* Para dispositivos móviles */
+
+          document.execCommand("copy");
+          alert("Enlace copiado al portapapeles: " + enlaceInput.value);
+        }
+      }
+
+      $(document).ready( function () {
+        $('#tablaMunicipios').DataTable({
+          "pageLength": 10 
+        });
+      } );
+    </script>
+  </body>
+</html>

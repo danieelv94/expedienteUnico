@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <%- include('../includes/head') %>
+    <title>Asignar Residentes a Obras</title>
+  </head>
+  <body>
+    <%- include('../includes/header', { req: req }) %>
+    
+    <div class="container" style="margin-top: 80px !important">
+      <h1 class="text-center">Asignar Residentes a Obras</h1>
+
+      <form id="formularioAsignarResidente" method="POST">
+        <div class="mb-3">
+          <label for="obra" class="form-label">Selecciona una obra:</label>
+          <select id="obra" name="obra" class="form-select" required>
+            <option value="">Seleccionar obra</option> 
+            <% obras.forEach(function(obra) { %>
+              <option value="<%= obra.id %>"><%= obra.nombre_obra %></option>
+              <script>console.log("Obra ID:", <%= obra.id %>);</script> 
+            <% }); %>
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <label for="residente" class="form-label">Selecciona un residente:</label>
+          <select id="residente" name="residente" class="form-select" required>
+            <option value="">Seleccionar residente</option> 
+            <% residentes.forEach(function(residente) { %>
+              <option value="<%= residente.id_usuario %>"><%= residente.nombre_usuario %></option> 
+            <% }); %>
+          </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Asignar Residente</button>
+      </form>
+    </div>
+
+    <%- include('../includes/scripts') %>
+    <script>
+      // Manejar el envío del formulario
+      const form = document.getElementById('formularioAsignarResidente');
+      form.addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        // Crear un objeto FormData con los datos del formulario
+        const formData = new FormData(form); 
+ // Obtener el valor del select de la obra
+ const obraId = document.getElementById('obra').value;
+
+// Obtener el valor del select de residentes
+const residenteId = document.getElementById('residente').value;
+        // Realizar la petición AJAX para asignar el residente
+        fetch('/asignar-residentes', { 
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({ obra: obraId, residente: residenteId }) 
+})
+        .then(response => {
+          if (response.ok) {
+            Swal.fire({
+              icon: 'success',
+              title: 'Residente asignado correctamente',
+              showConfirmButton: false,
+              timer: 1500
+            });
+            form.reset(); // Limpiar el formulario después de asignar
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: 'Error al asignar el residente',
+              text: 'Obra ya asignada.'
+            });
+          }
+        })
+        .catch(error => console.error('Error:', error));
+      });
+    </script>
+  </body>
+</html>

@@ -35,11 +35,11 @@
                         <h5 class="modal-title" id="modalModificarAvanceLabel<%= obra.id %>">Modificar Avance Físico</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                       </div>
-                      <form action="/guardar-avance-fisico/<%= obra.id %>" method="POST">
+                      <form action="/guardar-avance-fisico/<%= obra.id %>" method="POST" onsubmit="guardarAvanceFisico(event, <%= obra.id %>)"> 
                         <div class="modal-body">
                           <div class="mb-3">
-                            <label for="avanceFisico" class="form-label">Avance Físico (%):</label>
-                            <input type="number" step="0.01" class="form-control" id="avanceFisico" name="avanceFisico" min="0" max="100" value="<%= obra.porcentaje_fisico %>">
+                            <label for="avanceFisico<%= obra.id %>" class="form-label">Avance Físico (%):</label>
+                            <input type="number" step="0.01" class="form-control" id="avanceFisico<%= obra.id %>" name="avanceFisico" min="0" max="100" value="<%= obra.porcentaje_fisico %>"> 
                           </div>
                         </div>
                         <div class="modal-footer">
@@ -58,5 +58,66 @@
     </div>
 
     <%- include('../includes/scripts') %>
+
+    <script>
+      function guardarAvanceFisico(event, obraId) {
+        event.preventDefault(); // Evitar que el formulario se envíe de forma tradicional
+
+        // Obtener el valor del avance físico del formulario (usando el ID único)
+        const nuevoAvance = document.getElementById(`avanceFisico${obraId}`).value; 
+
+        // Validar que nuevoAvance sea un número entre 0 y 100 (opcional)
+        if (isNaN(nuevoAvance) || nuevoAvance < 0 || nuevoAvance > 100) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error de validación',
+            text: 'El avance físico debe ser un número entre 0 y 100.'
+          });
+          return; 
+        }
+
+        // Realizar la petición AJAX para guardar los cambios
+        fetch(`/guardar-avance-fisico/${obraId}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ avanceFisico: nuevoAvance })
+        })
+        .then(response => {
+          if (response.ok) {
+            return response.json(); // Obtener la respuesta JSON
+          } else {
+            throw new Error('Error al guardar los cambios');
+          }
+        })
+        .then(data => {
+          // Mostrar la alerta con SweetAlert
+          Swal.fire({
+            icon: 'success',
+            title: data.message, // Mostrar el mensaje de la respuesta
+            showConfirmButton: false,
+            timer: 1500
+          });
+
+          // Actualizar el valor en la tabla
+          const filaObra = event.target.closest('tr'); // Obtener la fila de la tabla
+          const celdaAvance = filaObra.querySelector('td:nth-child(2)'); // Obtener la celda del avance
+          celdaAvance.textContent = `${nuevoAvance} %`; // Actualizar el valor en la celda
+
+          // Cerrar el modal después de mostrar la alerta
+          const modal = bootstrap.Modal.getInstance(document.getElementById(`modalModificarAvance${obraId}`)); 
+          modal.hide(); 
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          Swal.fire({
+            icon: 'error',
+            title: 'Error al guardar los cambios',
+            text: 'Por favor, inténtalo de nuevo más tarde.'
+          });
+        });
+      }
+    </script>
   </body>
 </html>

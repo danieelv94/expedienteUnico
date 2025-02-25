@@ -36,6 +36,7 @@
           <ul class="list-group list-group-flush">
             <li class="list-group-item">
               <h3 id="nombreObra"></h3>
+              <h3 id="municipio"></h3>
             </li>
             <li class="list-group-item">
               Contratista: <span id="contratista"></span>
@@ -91,6 +92,7 @@
       .then(data => {
         if (data) {
           document.getElementById('nombreObra').textContent = nombreObra;
+          document.getElementById('municipio').textContent = data.municipio || 'N/A';
           document.getElementById('contratista').textContent = data.contratista || 'N/A';
           document.getElementById('residentes').textContent = data.residentes || 'N/A';
           document.getElementById('porcentajeFisico').textContent = data.porcentaje_fisico || '0';
@@ -148,6 +150,8 @@ function generarFilasTabla(obra) {
     "Est. 2",
     "Est. 3",
     "Est. 4",
+    "Est. 5",
+    "Est. 6",
     "Finiquito"
   ];
   const responsables = [
@@ -165,21 +169,23 @@ function generarFilasTabla(obra) {
     "DIH -DPE- SH",
     "DIH -DPE- SH",
     "DIH -DPE- SH",
+    "DIH -DPE- SH",
+    "DIH -DPE- SH",
     "DIH -DPE- SH"
   ];
 
   let filasHTML = "";
-  for (let i = 1; i <= 15; i++) {
+  for (let i = 1; i <= 17; i++) {
     filasHTML += `
       <tr>
         <td>${documentacion[i - 1]}</td>
         <td>${responsables[i - 1]}</td>
         <td>
-          <input type="checkbox" id="check1_${i}" class="checkbox" disabled ${obra[`check${i}_1`] ? 'checked' : ''}>
+          <input type="checkbox" id="check1_${i}" class="checkbox" disabled ${obra[`check${i}_1`] === 1 ? 'checked' : ''}>
           <label for="check1_${i}"></label> 
         </td>
         <td>
-          <input type="checkbox" id="check2_${i}" class="checkbox" disabled ${obra[`check${i}_2`] ? 'checked' : ''}>
+          <input type="checkbox" id="check2_${i}" class="checkbox" disabled ${obra[`check${i}_2`] === 1 ? 'checked' : ''}>
           <label for="check2_${i}"></label> 
         </td>
         <td>`;
@@ -197,9 +203,11 @@ function generarFilasTabla(obra) {
       case 12: // Est. 2
       case 13: // Est. 3
       case 14: // Est. 4
+      case 15: // Est. 5
+      case 16: // Est. 6
         monto = obra[`monto_est${i - 10}`] || 0; 
         break;
-      case 15: // Finiquito
+      case 17: // Finiquito
         monto = obra.monto_finiquito || 0;
         break;
     }
@@ -207,7 +215,7 @@ function generarFilasTabla(obra) {
     // Formatear el monto con separadores de miles
     const montoFormateado = formatearNumero(monto);
 
-    filasHTML += `${(i === 7 || i === 9 ||  (i >= 11 && i <= 14) || i === 15) ? montoFormateado : ''}
+    filasHTML += `${(i === 7 || i === 9 ||  (i >= 11 && i <= 16) || i === 17) ? montoFormateado : ''}
         </td>
       </tr>`;
   }
@@ -223,10 +231,12 @@ function calcularSaldoAPagar(obra) {
   const montoEst2 = parseFloat(obra.monto_est2) || 0;
   const montoEst3 = parseFloat(obra.monto_est3) || 0;
   const montoEst4 = parseFloat(obra.monto_est4) || 0;
+  const montoEst5 = parseFloat(obra.monto_est5) || 0;
+  const montoEst6 = parseFloat(obra.monto_est6) || 0;
   const montoFiniquito = parseFloat(obra.monto_finiquito) || 0;
 
   // Calcular el total de las estimaciones
-  const totalEstimaciones = montoEst1 + montoEst2 + montoEst3 + montoEst4;
+  const totalEstimaciones = montoEst1 + montoEst2 + montoEst3 + montoEst4 + montoEst5 + montoEst6;
 
   // Calcular el saldo a pagar
   const saldo = montoContrato - montoAnticipo - totalEstimaciones - montoFiniquito;

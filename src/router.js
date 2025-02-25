@@ -26,6 +26,8 @@ const {
   registrarCheckInDocumentacion
 } = obraController;
 
+import fichaController from "./fichaController.js";
+
 import { verificarAutenticacion } from './middleware.js'; 
 import ventanillaController from './ventanillaController.js'; 
 
@@ -63,6 +65,13 @@ router.get('/obtener-roles-usuario/:id', verificarAutenticacion, async (req, res
     res.status(500).json({ error: "Error al obtener roles del usuario" });
   }
 });
+
+
+router.get('/ficha', verificarAutenticacion, fichaController.mostrarFicha);  
+router.post('/subir-pdf/:id', verificarAutenticacion, fichaController.subirPDF);
+
+router.get('/asignar-residentes', verificarAutenticacion, avanceController.mostrarAsignarResidentes);
+router.post('/asignar-residentes', verificarAutenticacion, avanceController.asignarResidente);
 
 router.post('/eliminar-roles-usuario/:id', verificarAutenticacion, superAdminController.eliminarRolesUsuario);
 import residentesController from './residentesController.js'; // 

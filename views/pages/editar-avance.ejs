@@ -35,15 +35,6 @@
             <input type="text" class="form-control" id="contratista" name="contratista">
           </div>
           <div class="mb-3">
-            <label for="residentes" class="form-label">Residente:</label>
-            <select id="residentes" name="residentes" class="form-select">
-              <option value="">Seleccionar residente</option>
-              <% residentes.forEach(function(residente) { %>
-                <option value="<%= residente.id_usuario %>"><%= residente.nombre_usuario %></option>
-              <% }); %>
-            </select>
-          </div>
-          <div class="mb-3">
             <label for="porcentajeAvance" class="form-label">Porcentaje de avance:</label>
             <input type="number" step="0.01" class="form-control" id="porcentajeAvance" name="porcentajeAvance" min="0" max="100">
           </div>
@@ -80,6 +71,14 @@
             <input type="number" step="0.01" class="form-control" id="montoEst4" name="montoEst4">
           </div>
           <div class="mb-3">
+            <label for="montoEst5" class="form-label">Monto Estimación 5:</label>
+            <input type="number" step="0.01" class="form-control" id="montoEst5" name="montoEst5">
+          </div>
+          <div class="mb-3">
+            <label for="montoEst6" class="form-label">Monto Estimación 6:</label>
+            <input type="number" step="0.01" class="form-control" id="montoEst6" name="montoEst6">
+          </div>
+          <div class="mb-3">
             <label for="montoFiniquito" class="form-label">Monto Finiquito:</label>
             <input type="number" step="0.01" class="form-control" id="montoFiniquito" name="montoFiniquito">
           </div>
@@ -110,6 +109,8 @@
                   "Est. 2",
                   "Est. 3",
                   "Est. 4",
+                  "Est. 5",
+                  "Est. 6",
                   "Finiquito"
                 ];
                 const responsables = [
@@ -127,10 +128,12 @@
                   "DIH -DPE- SH",
                   "DIH -DPE- SH",
                   "DIH -DPE- SH",
+                  "DIH -DPE- SH",
+                  "DIH -DPE- SH",
                   "DIH -DPE- SH"
                 ];
 
-                for (let i = 1; i <= 15; i++) { 
+                for (let i = 1; i <= 17; i++) { 
               %>
                 <tr>
                   <td><%= documentacion[i - 1] %></td>
@@ -180,22 +183,23 @@
         if (nombreObra) {
           // Realizar la petición AJAX
           
-          fetch(`/obtener-informacion-obra/${encodeURIComponent(nombreObra)}`) // Corrección aquí
-            .then(response => response.json())
-            .then(data => {
+          fetch(`/obtener-informacion-obra/${encodeURIComponent(nombreObra)}`)
+          .then(response => response.json())
+          .then(data => {
               console.log("Información de la obra:", data); // Agregar esta línea para depurar
               if (data) {
                 document.getElementById('nombreObra').textContent = nombreObra;
 
                 // Llenar los campos del formulario con la información de la obra
                 document.getElementById('contratista').value = data.contratista;
-                document.getElementById('residentes').value = data.residentes;
                 document.getElementById('montoContrato').value = data.monto_contrato;
                 document.getElementById('montoAnticipo').value = data.monto_anticipo;
                 document.getElementById('montoEst1').value = data.monto_est1;
                 document.getElementById('montoEst2').value = data.monto_est2;
                 document.getElementById('montoEst3').value = data.monto_est3;
                 document.getElementById('montoEst4').value = data.monto_est4;
+                document.getElementById('montoEst5').value = data.monto_est5;
+                document.getElementById('montoEst6').value = data.monto_est6;
                 document.getElementById('montoFiniquito').value = data.monto_finiquito;
                 document.getElementById('porcentajeAvance').value = data.porcentaje_avance;
                 document.getElementById('porcentajeFisico').value = data.porcentaje_fisico || 0; // Si no existe, asignar 0
@@ -204,11 +208,10 @@
 
 
                 // Actualizar la tabla con la información de la obra
-                for (let i = 1; i <= 15; i++) {
+                for (let i = 1; i <= 17; i++) {
                   document.getElementById(`check1_${i}`).checked = data[`check${i}_1`] || false;
                   document.getElementById(`check2_${i}`).checked = data[`check${i}_2`] || false;
                 }
-
                 document.getElementById('informacionObra').style.display = 'block';
               } else {
                 // Manejar el caso en que la obra no se encuentra

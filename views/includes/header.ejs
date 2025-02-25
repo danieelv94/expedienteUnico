@@ -44,6 +44,16 @@
         <a class="menu-item" href="/residentes"> Residentes </a> 
       </li>
     <% } %>
+    <% if (req.session.user && req.session.roles.includes('Infraestructura')) { %>  
+      <li>
+        <a class="menu-item" href="/asignar-residentes"> Asignar Residente</a> 
+      </li>
+    <% } %>
+    <% if (req.session.user && req.session.roles.includes('Ficha')) { %>  
+      <li>
+        <a class="menu-item" href="/ficha"> Ficha</a> 
+      </li>
+    <% } %>
     <% if (req.session.user && req.session.roles.includes('Super Admin')) { %>  
       <li>
         <a class="menu-item" href="/super-admin"> Super Admin </a> 
