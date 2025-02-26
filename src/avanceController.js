@@ -25,7 +25,6 @@ export const mostrarAvances = async (req, res) => {
       const nombreObra = obras[0].nombre_obra; 
       obra = await obtenerInformacionObra(nombreObra);
     }
-    console.log("Valor de obra:", obra);
     res.render("pages/avance", { 
       obras, 
       fuentesFinanciamiento, 
@@ -47,7 +46,6 @@ export const obtenerFuentesFinanciamiento = async () => {
       );
       return rows.map(row => row.fuente_financiamiento);
     } catch (error) {
-      console.error("Error al obtener fuentes de financiamiento:", error);
       throw { status: 500, message: "Error al obtener fuentes de financiamiento" };
     }
   };
@@ -63,7 +61,6 @@ export const obtenerFuentesFinanciamiento = async () => {
       );
       return rows;
     } catch (error) {
-      console.error("Error al obtener Obras de Avance por fuente:", error);
       throw { status: 500, message: "Error al obtener Obras de Avance por fuente" };
     }
   };
@@ -141,7 +138,6 @@ export const obtenerFuentesFinanciamiento = async () => {
         residenteId: obra.residente_id, // Agregar el ID del residente
       };
     } catch (error) {
-      console.error("Error al obtener información de la obra:", error);
       throw { status: 500, message: "Error al obtener información de la obra" };
     }
   };
@@ -160,7 +156,6 @@ export const obtenerFuentesFinanciamiento = async () => {
       );
       return rows;
     } catch (error) {
-      console.error("Error al obtener Obras de Avance:", error);
       throw { status: 500, message: "Error al obtener Obras de Avance" };
     }
   };
@@ -185,13 +180,15 @@ export const obtenerFuentesFinanciamiento = async () => {
       const nombreObra = req.params.nombre;
       const data = req.body;
   
+  
       // Construir la consulta SQL para actualizar la obra
       let sql = "UPDATE obras_avance SET ";
       const values = [];
       for (let i = 1; i <= 17; i++) {
         sql += `check${i}_1 = ?, check${i}_2 = ?, `; 
-        values.push(data[`check${i}_1`] === 'on' ? 1 : 0); 
-        values.push(data[`check${i}_2`] === 'on' ? 1 : 0);
+        // Agregar validación para los checkboxes
+        values.push(typeof data[`check${i}_1`] === 'undefined' ? 0 : (data[`check${i}_1`] === 'on' ? 1 : 0));
+        values.push(typeof data[`check${i}_2`] === 'undefined' ? 0 : (data[`check${i}_2`] === 'on' ? 1 : 0));
       }
       
       sql += "monto_contrato = ?,monto_anticipo = ?,monto_est1 = ?,monto_est2 = ?,monto_est3 = ?,monto_est4 = ?,monto_est5 = ?,monto_est6 = ?,monto_finiquito = ?,contratista = ?,porcentaje_avance = ?, porcentaje_fisico = ?, porcentaje_financiero = ?, observaciones = ? WHERE nombre_obra = ?";
@@ -210,42 +207,15 @@ export const obtenerFuentesFinanciamiento = async () => {
         data.porcentajeFisico, 
         data.porcentajeFinanciero, 
         data.observaciones, 
-        data.municipio,
-        nombreObra
+        nombreObra // Asegúrate de que nombreObra es el parámetro correcto para la cláusula WHERE
       );
   
-      // Ejecutar la consulta SQL para actualizar la obra
+  
       await pool.query(sql, values);
       
-      // Obtener el ID de la obra
-      const obraId = await obtenerIdObraPorNombre(nombreObra);
-  
-      // Verificar si se proporcionó un ID de residente
-      if (data.residentes) { 
-        // Si se proporcionó un ID de residente, verificar si ya existe una asignación
-        const [rows] = await pool.query(
-          "SELECT * FROM obras_residentes WHERE obra_id = ?",
-          [obraId]
-        );
-  
-        if (rows.length > 0) {
-          // Si ya existe, actualizar la asignación
-          await pool.query(
-            "UPDATE obras_residentes SET residente_id = ? WHERE obra_id = ?",
-            [data.residentes, obraId]
-          );
-        } else {
-          // Si no existe, insertar una nueva asignación
-          await pool.query(
-            "INSERT INTO obras_residentes (obra_id, residente_id) VALUES (?, ?)",
-            [obraId, data.residentes]
-          );
-        }
-      }
   
       res.status(200).send('Cambios guardados correctamente');
     } catch (error) {
-      console.error("Error al guardar la información de la obra:", error);
       res.status(500).send('Error al guardar los cambios');
     }
   };
@@ -259,7 +229,6 @@ export const obtenerFuentesFinanciamiento = async () => {
       );
       return rows;
     } catch (error) {
-      console.error("Error al obtener residentes:", error);
       throw { status: 500, message: "Error al obtener residentes" };
     }
   };
@@ -275,7 +244,6 @@ export const obtenerIdObraPorNombre = async (nombreObra) => {
     }
     return rows[0].id;
   } catch (error) {
-    console.error("Error al obtener ID de la obra:", error);
     throw { status: 500, message: "Error al obtener ID de la obra" };
   }
 };
@@ -298,14 +266,12 @@ export const mostrarAsignarResidentes = async (req, res) => {
 
 export const asignarResidente = async (req, res) => {
   try {
-    console.log("Datos recibidos:", req.body);
 
     const obraId = req.body.obra;
     const residenteId = req.body.residente;
 
     // Validar que obraId sea un número entero
     if (!obraId || !/^\d+$/.test(obraId)) { 
-      console.error("obraId no es válido:", obraId);
       return res.status(400).send('Debe seleccionar una obra válida');
     }
 
@@ -320,7 +286,6 @@ export const asignarResidente = async (req, res) => {
       return res.status(400).send('Esta obra ya tiene un residente asignado.');
     } else {
       // Insertar una nueva asignación
-      console.log("Insertando nueva asignación para obraId:", obraId);
       await pool.query(
         "INSERT INTO obras_residentes (obra_id, residente_id) VALUES (?, ?)",
         [obraId, residenteId]
@@ -329,7 +294,6 @@ export const asignarResidente = async (req, res) => {
 
     res.status(200).send('Residente asignado correctamente');
   } catch (error) {
-    console.error("Error al asignar residente:", error);
     res.status(500).send(`Error al asignar el residente: ${error.message}`);
   }
 };
