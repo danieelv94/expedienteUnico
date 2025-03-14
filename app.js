@@ -40,7 +40,7 @@ app.get("/", (req, res) => {
 // Usa el enrutador para las rutas relacionadas con usuarios
 app.use("/", router);
 
-const PORT = process.env.PORT || 3600;
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Servidor en ejecución en http://127.0.0.1:${PORT}`);
 });

@@ -54,6 +54,11 @@
         <a class="menu-item" href="/ficha"> Ficha</a> 
       </li>
     <% } %>
+    <% if (req.session.user && req.session.roles.includes('Recepcionista')) { %>  
+      <li>
+        <a class="menu-item" href="/visitantes"> Recepción</a> 
+      </li>
+    <% } %>
     <% if (req.session.user && req.session.roles.includes('Super Admin')) { %>  
       <li>
         <a class="menu-item" href="/super-admin"> Super Admin </a> 

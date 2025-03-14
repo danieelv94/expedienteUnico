@@ -9,6 +9,12 @@ import {
 } from './authController.js'; 
 
 import obraController from './obraController.js'; 
+import visitantesRouter from './visitantesRouter.js'; // Importa el router de visitantes
+router.get("/visitantes", verificarAutenticacion, (req, res) => {
+  res.render("pages/visitantes", { req: req });
+});
+
+router.use('/', visitantesRouter);
 
 const { 
   mostrarObras, 
